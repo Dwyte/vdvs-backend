@@ -1,15 +1,12 @@
 extends header.pug
 
 block appContent
-    h3 President
     form#vote-form
-        label Carl Mosquida
-            input(type="radio" name="pres" value="1")
-        br
-        label Geronimo Valdez
-            input(type="radio" name="pres" value="2")
-        br
-        label John Eleserio
-            input(type="radio" name="pres" value="3")
-        br
+        each e in election
+            h3= e.position
+            div(id=e.position)
+                each candidate in e.candidates
+                    label= candidate.name
+                        input(type="radio" name=e.position value=candidate.id)
+                    br
         input#vote-submit-button(type="submit")

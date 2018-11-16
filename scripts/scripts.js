@@ -16,15 +16,18 @@ $(() => {
 
     $('#vote-form').on('click', '#vote-submit-button', () => {
         event.preventDefault();
-        const votedForPresident = $('input[name=pres]:checked', '#vote-form').val();
+
+        var values = $('#vote-form :input:checked').map(function(){return $(this).val();}).get();
+
+        console.log(values[0]);
 
         $.ajax({
-            url: '/vote/' + votedForPresident,
+            url: '/vote/s',
             contentType: 'application/json',
             method: 'PUT',
+            data: JSON.stringify({data: values}),
             success: (response) => {
                 console.log(response);
-                $('#cadidate' + votedForPresident + 'votes').text = "Votes: " + response;
             }
         })
     })
