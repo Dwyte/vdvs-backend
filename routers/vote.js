@@ -16,7 +16,7 @@ router.put('/:id', (req, res) => {
 
     candidateVoted.votes += 1;
 
-    res.send(candidateVoted.name + " votes is now " + candidateVoted.votes);
+    res.send(String(candidateVoted.votes));
 });
 
 module.exports = router;
