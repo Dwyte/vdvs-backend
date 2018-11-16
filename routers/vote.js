@@ -8,7 +8,7 @@ const candidates  = [
 ]
 
 router.get('/', (req, res) => {
-    res.sendFile('/home/dwyte/projects/voting-system/vote.html');
+    res.render('../views/vote.pug');
 });
 
 router.put('/:id', (req, res) => {

@@ -1,0 +1,15 @@
+extends header.pug
+
+block appContent
+    h3 President
+    form#vote-form
+        label Carl Mosquida
+            input(type="radio" name="pres" value="1")
+        br
+        label Geronimo Valdez
+            input(type="radio" name="pres" value="2")
+        br
+        label John Eleserio
+            input(type="radio" name="pres" value="3")
+        br
+        input#vote-submit-button(type="submit")
