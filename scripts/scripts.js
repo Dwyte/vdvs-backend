@@ -22,9 +22,9 @@ $(() => {
         })
     });
 
+    // Admin
     $('#nominate-form').on('click', '#nominate-candidate', () => {
-        event.preventDefault();
-        
+
         const position = $('#nominate-form :input[name=position]').val();
         const candidate = $('#nominate-form :input[name=candidatename]').val();
         const quantity = $('#nominate-form :input[name=quantity]').val();
@@ -39,4 +39,45 @@ $(() => {
             }
         })
     })
+
+    $('#election-dashboard').on('click', '.update-candidate-name', () => {
+        const rowEl = $('.update-candidate-name').closest('tr');
+        const candidateID = rowEl.find('.id').text();
+        const candidatePosition = rowEl.find('.position').text();
+        const newName = rowEl.find('.name').val();
+        
+        console.log(`candidateid: ${candidateID} candidatePosition: ${candidatePosition} newName: ${newName}`);
+
+        $.ajax({
+            url: '/admin/update/' + candidateID,
+            contentType: 'application/json',
+            method: 'PUT',
+            data: JSON.stringify({position: candidatePosition, newName: newName}),
+            success: (response) => {
+                console.log(response);
+                //location.reload();
+            }
+        })
+    });
+
+    $('#election-dashboard').on('click', '.remove-candidate', () => {
+        const rowEl = $('.remove-candidate').closest('tr');
+        const candidateID = rowEl.find('.id').text();
+        const candidatePosition = rowEl.find('.position').text();
+        
+        console.log(`candidateid: ${candidateID} candidatePosition: ${candidatePosition}`);
+
+        $.ajax({
+            url: '/admin/remove/' + candidateID,
+            contentType: 'application/json',
+            method: 'DELETE',
+            data: JSON.stringify({position: candidatePosition}),
+            success: (response) => {
+                console.log(response);
+                //location.reload();
+            }
+        })
+    });
+
+
 });

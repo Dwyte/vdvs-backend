@@ -3,6 +3,9 @@ extends header.pug
 block appContent
     b Welcome to the Admin's page. If you're not the admin, then what the hell are you doing here?
     br
+    
+    hr
+
     form#nominate-form
         label(for="position") Position:
             input(type="text" name="position")
@@ -14,5 +17,25 @@ block appContent
             input(type="number" name="quantity")
         br
         button#nominate-candidate Add
-
     
+    hr
+    div#election-dashboard
+        table
+            thead
+                tr
+                    th ID
+                    th Position
+                    th Candidate Name
+                    th Actions
+
+            tbody
+                each e in election
+                    each candidate in e.candidates
+                        tr
+                            td.id= String(candidate.id)
+                            td.position= e.position
+                            td 
+                                input.name(type="text" name=e.position value=candidate.name)
+                            td
+                                button.update-candidate-name Update
+                                button.remove-candidate Remove
