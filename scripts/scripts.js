@@ -19,7 +19,7 @@ $(() => {
 
         var values = $('#vote-form :input:checked').map(function(){return $(this).val();}).get();
 
-        console.log(values[0]);
+        console.log(values[values.length - 1]);
 
         $.ajax({
             url: '/vote/s',

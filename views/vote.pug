@@ -5,8 +5,14 @@ block appContent
         each e in election
             h3= e.position
             div(id=e.position)
-                each candidate in e.candidates
-                    label= candidate.name
-                        input(type="radio" name=e.position value=candidate.id)
-                    br
+                if e.quantity <= 1
+                    each candidate in e.candidates
+                        label= candidate.name
+                            input(type="radio" name=e.position value=candidate.id)
+                        br
+                else
+                    each candidate in e.candidates
+                        label= candidate.name
+                            input(type="checkbox" name=e.position value=candidate.id)
+                        br
         input#vote-submit-button(type="submit")
