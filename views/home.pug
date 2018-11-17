@@ -9,6 +9,7 @@ block appContent
 
     a(href="/vote") [Voter's Ballot]
 
+    a(href="/admin") [Admin's Page]
     br
 
     label(for="lrn")
@@ -17,12 +18,12 @@ block appContent
         button(id="#receipt-explorer-input") Search
 
     hr
-    div liveResult
-        h3 Current Results (Refresh to Update)
-        each e in election
-            h3= e.position
-            div(id=e.position)
-                each candidate in e.candidates
-                    b= candidate.name
-                    div= candidate.votes
-                    br
+    //- div liveResult
+    //-     h3 Current Results (Refresh to Update)
+    //-     each e in election
+    //-         h3= e.position
+    //-         div(id=e.position)
+    //-             each candidate in e.candidates
+    //-                 b= candidate.name
+    //-                 div= candidate.votes
+    //-                 br

@@ -1,0 +1,18 @@
+extends header.pug
+
+block appContent
+    b Welcome to the Admin's page. If you're not the admin, then what the hell are you doing here?
+    br
+    form#nominate-form
+        label(for="position") Position:
+            input(type="text" name="position")
+        br
+        label(for="candidatename") Candidate's Name:
+            input(type="text" name="candidatename")
+        br
+        label(for="quantity") # of possible winners:
+            input(type="number" name="quantity")
+        br
+        button#nominate-candidate Add
+
+    

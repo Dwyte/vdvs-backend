@@ -9,8 +9,6 @@ $(() => {
             section: $('#info-form :input[name= section]').val().replace(/\s/g, '').toLowerCase()
         }
 
-        //console.log(`LRN: ${lrn} Full Name: ${fullName} Grade ${gradeLevel} Section ${section}`);
-
         var voterVotes = $('#vote-form :input:checked').map(function(){return $(this).val();}).get();
 
         $.ajax({
@@ -23,4 +21,22 @@ $(() => {
             }
         })
     });
+
+    $('#nominate-form').on('click', '#nominate-candidate', () => {
+        event.preventDefault();
+        
+        const position = $('#nominate-form :input[name=position]').val();
+        const candidate = $('#nominate-form :input[name=candidatename]').val();
+        const quantity = $('#nominate-form :input[name=quantity]').val();
+
+        $.ajax({
+            url: '/admin/' + position,
+            contentType: 'application/json',
+            method: 'PUT',
+            data: JSON.stringify({position: position, candidate:candidate, quantity: parseInt(quantity)}),
+            success: (response) => {
+                console.log(response);
+            }
+        })
+    })
 });
