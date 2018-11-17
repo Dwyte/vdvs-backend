@@ -1,34 +1,26 @@
 $(() => {
-    $('#login-form').on('click', '#register-button', () => {
+    $('#ballot-div').on('click', '#ballot-submit-button', () => {
         event.preventDefault();
-        const lrn = $('#lrn-input').val();
-        const pass = $('#pass-input').val();
+        
+        const voterInfo = {
+            lrn: parseInt($('#info-form :input[name= lrn]').val()),
+            fullName: $('#info-form :input[name= fullName]').val().replace(/\s/g, '').toLowerCase(),
+            gradeLevel: parseInt($('#info-form :input[name= gradeLevel]').val()),
+            section: $('#info-form :input[name= section]').val().replace(/\s/g, '').toLowerCase()
+        }
+
+        //console.log(`LRN: ${lrn} Full Name: ${fullName} Grade ${gradeLevel} Section ${section}`);
+
+        var voterVotes = $('#vote-form :input:checked').map(function(){return $(this).val();}).get();
 
         $.ajax({
-            url: '/login/' + lrn,
-            contentType: 'application/json',
-            data: JSON.stringify({ newName: newName }),
-            success: (response) => {
-                console.log(response);
-            }
-        });
-    });
-
-    $('#vote-form').on('click', '#vote-submit-button', () => {
-        event.preventDefault();
-
-        var values = $('#vote-form :input:checked').map(function(){return $(this).val();}).get();
-
-        console.log(values[values.length - 1]);
-
-        $.ajax({
-            url: '/vote/s',
+            url: '/vote/' + voterInfo.lrn,
             contentType: 'application/json',
             method: 'PUT',
-            data: JSON.stringify({data: values}),
+            data: JSON.stringify({info:voterInfo,votes: voterVotes}),
             success: (response) => {
                 console.log(response);
             }
         })
-    })
-})
+    });
+});

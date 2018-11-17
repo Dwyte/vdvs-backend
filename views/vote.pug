@@ -1,18 +1,31 @@
 extends header.pug
 
 block appContent
-    form#vote-form
-        each e in election
-            h3= e.position
-            div(id=e.position)
-                if e.quantity <= 1
-                    each candidate in e.candidates
-                        label= candidate.name
-                            input(type="radio" name=e.position value=candidate.id)
-                        br
-                else
-                    each candidate in e.candidates
-                        label= candidate.name
-                            input(type="checkbox" name=e.position value=candidate.id)
-                        br
-        input#vote-submit-button(type="submit")
+    div#ballot-div
+        form#info-form
+            h3 Voter Information
+            label(for="lrn") LRN: 
+                input(type="text" name="lrn")
+            label(for="fullName") Full Name: 
+                input(type="text" name="fullName")
+            label(for="gradeLevel") Grade Level: 
+                input(type="number" name="gradeLevel" min="7" max="12" value="7")
+            label(for="section") Section: 
+                input(type="text" name="section")
+        button#check-info-button Validate
+
+        form#vote-form
+            each e in election
+                h3= e.position
+                div(id=e.position)
+                    if e.quantity <= 1
+                        each candidate in e.candidates
+                            label= candidate.name
+                                input(type="radio" name=e.position value=candidate.id)
+                            br
+                    else
+                        each candidate in e.candidates
+                            label= candidate.name
+                                input(type="checkbox" name=e.position value=candidate.id)
+                            br
+        button#ballot-submit-button Submit

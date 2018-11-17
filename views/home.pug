@@ -7,4 +7,22 @@ block appContent
         | that uses state of the art technologies to bring your
         | votes into the right candidate.
 
-    a(href="/vote") [Vote]
+    a(href="/vote") [Voter's Ballot]
+
+    br
+
+    label(for="lrn")
+        b Receipt Explorer:
+        input(type="text" name="lrn" id="#receipt-explorer-input" placeholder = "Enter receipt reference #")
+        button(id="#receipt-explorer-input") Search
+
+    hr
+    div liveResult
+        h3 Current Results (Refresh to Update)
+        each e in election
+            h3= e.position
+            div(id=e.position)
+                each candidate in e.candidates
+                    b= candidate.name
+                    div= candidate.votes
+                    br
