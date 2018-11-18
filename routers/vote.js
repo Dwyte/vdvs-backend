@@ -1,9 +1,11 @@
 const express = require('express');
+const SHA256 = require('crypto-js/sha256');
 const database = require('./database.js');
 const router = express.Router();
 
 const voters = database.voters;
 var election = database.election;
+var voteReceipts = database.voteReceipts;
 
 
 // Render Vote page
@@ -11,11 +13,22 @@ router.get('/', (req, res) => {
     res.render('../views/vote.pug', {election : election});
 });
 
+router.get('/receipt/:voteReceiptID',(req, res) => {
+    const voteReceipt = voteReceipts.find(r => r.id === req.params.voteReceiptID);
+
+    if(!voteReceipt){
+        res.send('Receipt not found');
+        return;
+    }
+
+    res.render('../views/voteReceipt.pug', {voteReceipt: voteReceipt});
+})
+
 // Record Vote
-router.put('/:lrn', (req, res) => {
+router.put('/', (req, res) => {
 
     // Check if the Voter is registered in DB, and verify if all info's match.
-    const voter = GetVoterFromDB(req.params.lrn, req.body.info)
+    const voter = GetVoterFromDB(req.body.info)
 
     // If not, cancel operation.
     if(voter == null){
@@ -24,7 +37,7 @@ router.put('/:lrn', (req, res) => {
     }
 
     // If Voter has already voted
-    if(hasVoterAlreadyVoted(req.params.lrn)){
+    if(hasVoterAlreadyVoted(voter.lrn)){
         res.send('Voter already Voted');
         return;
     }
@@ -41,32 +54,36 @@ router.put('/:lrn', (req, res) => {
         votedCandidates.push(votedCandidate);
     });
 
-    voter.ballotResult = votedCandidates;
-    res.send(votedCandidates);
+    // Create Receipt
+    var receipt = {id: null, voterLRN: voter.lrn ,timestamp: new Date, votedCandidates: votedCandidates}
+    voter.voteReceiptID = receipt.id = SHA256(JSON.stringify(receipt)).toString().substr(0,12);
+    voteReceipts.push(receipt);
+
+    res.send(receipt.id)
 });
 
 function hasVoterAlreadyVoted(voterLRN){
     return voters.find(v => v.lrn === parseInt(voterLRN)).ballotResult != null;
 }
 
-function GetVoterFromDB(voterLRN, voterInfoObject){
-    const voterFromDataBase = voters.find(v => v.lrn === parseInt(voterLRN));
+function GetVoterFromDB(voterInfo){
+    const voterFromDataBase = voters.find(v => v.lrn === parseInt(voterInfo.lrn));
 
     if(!voterFromDataBase){
         console.log("Voter is not registered onto the database");
         return null;
     }
 
-    if(voterInfoObject.fullName != voterFromDataBase.fullName){
+    if(voterInfo.fullName != voterFromDataBase.fullName){
         console.log("Name Doesn't matched");
         return null;
     }
-    if(voterInfoObject.gradeLevel != voterFromDataBase.gradeLevel){
+    if(voterInfo.gradeLevel != voterFromDataBase.gradeLevel){
         console.log("Grade Level Doesn't matched");
         return null;
     }
 
-    if(voterInfoObject.section != voterFromDataBase.section){
+    if(voterInfo.section != voterFromDataBase.section){
         console.log("Section Doesn't matched");
         return null;
     }

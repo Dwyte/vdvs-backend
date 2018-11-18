@@ -16,12 +16,13 @@ $(() => {
 
         // Send PUT request
         $.ajax({
-            url: '/vote/' + voterInfo.lrn,
+            url: '/vote/',
             contentType: 'application/json',
             method: 'PUT',
             data: JSON.stringify({info:voterInfo,votes: voterVotes}),
             success: (response) => {
                 console.log(response);
+                location.replace('vote/receipt/' + response);
             }
         })
     });
