@@ -10,7 +10,7 @@ server.use(express.static(__dirname));
 // View Engine
 server.set('view-engine', 'pug');
 
-// Routers
+// Route Handlers
 server.use('/vote', vote);
 server.use('/admin', admin);
 

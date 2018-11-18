@@ -18,17 +18,18 @@ block appContent
         hr
 
         form#vote-form
-            each e in election
-                h3= e.position
-                div(id=e.position)
-                    if e.quantity <= 1
-                        each candidate in e.candidates
-                            label= candidate.name
-                                input(type="radio" name=e.position value=candidate.id)
-                            br
-                    else
-                        each candidate in e.candidates
-                            label= candidate.name
-                                input(type="checkbox" name=e.position value=candidate.id)
-                            br
+            -var positions = election.positions;
+            -var candidates = election.candidates;
+            each position in positions
+                h3= position.name
+                -var inputType = "radio"
+                -if(position.winnerQty > 1){inputType = "checkbox"}
+
+                each candidate in candidates
+                    if(candidate.position.name == position.name)
+                        label= candidate.name
+                            input(type=inputType name=position.name value=candidate.id)
+                        br
         button#ballot-submit-button Submit
+
+    script(src="/scripts/vote-jq.js" type='text/javascript')

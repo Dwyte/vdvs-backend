@@ -29,13 +29,16 @@ block appContent
                     th Actions
 
             tbody
-                each e in election
-                    each candidate in e.candidates
-                        tr
-                            td.id= String(candidate.id)
-                            td.position= e.position
-                            td 
-                                input.name(type="text" value=candidate.name)
-                            td
-                                button.update-candidate-name Update
-                                button.remove-candidate Remove
+                each e in election.positions
+                    each candidate in election.candidates
+                        if(candidate.position.name == e.name)
+                            tr
+                                td.id= String(candidate.id)
+                                td.position= e.name
+                                td 
+                                    input.name(type="text" value=candidate.name)
+                                td
+                                    button.update-candidate-name Update
+                                    button.remove-candidate Remove
+    
+    script(src="/scripts/admin-jq.js" type='text/javascript')

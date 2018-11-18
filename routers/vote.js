@@ -5,40 +5,40 @@ const router = express.Router();
 const voters = database.voters;
 var election = database.election;
 
+
+// Render Vote page
 router.get('/', (req, res) => {
     res.render('../views/vote.pug', {election : election});
 });
 
+// Record Vote
 router.put('/:lrn', (req, res) => {
 
+    // Check if the Voter is registered in DB, and verify if all info's match.
     const voter = GetVoterFromDB(req.params.lrn, req.body.info)
 
-    if(voter == null)
-        return;
-
-    if(hasVoterAlreadyVoted(req.params.lrn)){
-        console.log('Voter Already Voted');
+    // If not, cancel operation.
+    if(voter == null){
+        res.send('Voter was not found in the database, pleace double check your info.');
         return;
     }
 
+    // If Voter has already voted
+    if(hasVoterAlreadyVoted(req.params.lrn)){
+        res.send('Voter already Voted');
+        return;
+    }
+
+    
     var votes = req.body.votes;
     var votedCandidates = [];
 
-    election.forEach(element => {
-        if(element.quantity > 1){
-            for(i = 0; i < element.quantity && votes.length != 0; i++){
-                var candidate = element.candidates.find(c => c.id == votes[0])
-                candidate.votes += 1;
-                votedCandidates.push(candidate);
-                votes.shift();
-            }
-        }
-        else{
-            var candidate = element.candidates.find(c => c.id == votes[0])
-                candidate.votes += 1;
-                votedCandidates.push(candidate);
-                votes.shift();
-        }
+    votes.forEach(vote => {
+        var votedCandidate = election.candidates.find(c => c.id === vote);
+
+        votedCandidate.votes += 1;
+
+        votedCandidates.push(votedCandidate);
     });
 
     voter.ballotResult = votedCandidates;
