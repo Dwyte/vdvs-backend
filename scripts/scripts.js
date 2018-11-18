@@ -40,8 +40,10 @@ $(() => {
         })
     })
 
-    $('#election-dashboard').on('click', '.update-candidate-name', () => {
-        const rowEl = $('.update-candidate-name').closest('tr');
+
+
+    $("table").on('click','.update-candidate-name', function() {
+        const rowEl = $(this).parent().parent();
         const candidateID = rowEl.find('.id').text();
         const candidatePosition = rowEl.find('.position').text();
         const newName = rowEl.find('.name').val();
@@ -55,13 +57,13 @@ $(() => {
             data: JSON.stringify({position: candidatePosition, newName: newName}),
             success: (response) => {
                 console.log(response);
-                //location.reload();
+                location.reload();
             }
         })
     });
 
-    $('#election-dashboard').on('click', '.remove-candidate', () => {
-        const rowEl = $('.remove-candidate').closest('tr');
+    $("table").on('click','.remove-candidate', function() {
+        const rowEl = $(this).parent().parent();
         const candidateID = rowEl.find('.id').text();
         const candidatePosition = rowEl.find('.position').text();
         
@@ -74,10 +76,8 @@ $(() => {
             data: JSON.stringify({position: candidatePosition}),
             success: (response) => {
                 console.log(response);
-                //location.reload();
+                location.reload();
             }
         })
     });
-
-
 });

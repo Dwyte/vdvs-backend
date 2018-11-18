@@ -48,6 +48,7 @@ router.put('/update/:candidateID', (req, res) => {
     var candidate = position.candidates.find(c => c.id === req.params.candidateID);
 
     candidate.name = req.body.newName;
+    candidate.id = SHA256(candidate.name.replace(/\s/g, '').toLowerCase()).toString().substr(0,6);
 
     res.send("Updated Candidate Name");
 });
