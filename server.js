@@ -1,7 +1,13 @@
+const mongoose = require('mongoose');
 const express = require('express');
 const server = express();
 const vote = require('./routers/vote.js')
 const admin = require('./routers/admin.js')
+
+// Connect to MongoDB
+mongoose.connect('mongodb://localhost/vdvs-dev', {useNewUrlParser: true})
+    .then(() => console.log("Connected to MongoDB"))
+    .catch((error) => console.log("Unable to connect to MongoDB", error));
 
 // Middlewares
 server.use(express.json())

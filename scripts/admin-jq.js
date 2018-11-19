@@ -2,21 +2,20 @@ $(() => {
     // Nomination of Candidates
     $('#nominate-form').on('click', '#nominate-candidate', () => {
 
-        const position = $('#nominate-form :input[name=position]').val();
-        const candidate = $('#nominate-form :input[name=candidatename]').val();
+        const positionName = $('#nominate-form :input[name=position]').val();
+        const candidateName = $('#nominate-form :input[name=candidatename]').val();
         const winnerQty = $('#nominate-form :input[name=quantity]').val();
 
-        console.log(`Candidate Name: ${candidate} Poistion: ${position} winnerQty ${winnerQty}`);
+        console.log(`Candidate Name: ${candidateName} Poistion: ${positionName} winnerQty ${winnerQty}`);
 
         // Send PUT request
         $.ajax({
-            url: '/admin/nominate/' + candidate,
+            url: '/admin/nominate/',
             contentType: 'application/json',
             method: 'PUT',
-            data: JSON.stringify({name: position, winnerQty: parseInt(winnerQty)}),
+            data: JSON.stringify({candidateName: candidateName, positionName: positionName, winnerQty: parseInt(winnerQty)}),
             success: (response) => {
                 console.log(response);
-
             }
         });
     });
@@ -37,7 +36,7 @@ $(() => {
             data: JSON.stringify({newName: newName}),
             success: (response) => {
                 console.log(response);
-                location.reload();
+                //location.reload();
             }
         })
     });
@@ -56,7 +55,7 @@ $(() => {
             method: 'DELETE',
             success: (response) => {
                 console.log(response);
-                location.reload();
+                //location.reload();
             }
         })
     });

@@ -2,11 +2,22 @@ const express = require('express');
 const SHA256 = require('crypto-js/sha256');
 const database = require('./database.js');
 const router = express.Router();
+const mongoose = require('mongoose');
 
-const voters = database.voters;
-var election = database.election;
-var voteReceipts = database.voteReceipts;
+// const voters = database.voters;
+// var election = database.election;
+// var voteReceipts = database.voteReceipts;
 
+
+const voterSchema = mongoose.Schema({
+    lrn: Number,
+    fullName: String,
+    gradeLevel: Number,
+    section: String,
+    voteReceiptID: String
+})
+
+const Voter = mongoose.model('Voter', voterSchema);
 
 // Render Vote page
 router.get('/', (req, res) => {
