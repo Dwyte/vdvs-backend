@@ -4,7 +4,7 @@ block appContent
     div 
         b Vote Receipt # #{voteReceipt.id}
     div 
-        b Casted by: #{voteReceipt.voterLRN}
+        b Casted by: #{voteReceipt.lrn}
     -const t = voteReceipt.timestamp;
     div 
         b Time Casted: #{(t.getMonth() + 1) + '/' + t.getDate() + '/' + t.getFullYear() + ' | ' + t.getHours() + ':' + t.getMinutes() + ':' + t.getSeconds()}

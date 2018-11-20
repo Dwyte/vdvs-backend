@@ -19,26 +19,26 @@ block appContent
         button#nominate-candidate Add
     
     hr
-    //- div#election-dashboard
-    //-     table
-    //-         thead
-    //-             tr
-    //-                 th ID
-    //-                 th Position
-    //-                 th Candidate Name
-    //-                 th Actions
+    div#election-dashboard
+        table
+            thead
+                tr
+                    th ID
+                    th Position
+                    th Candidate Name
+                    th Actions
 
-    //-         tbody
-    //-             each e in election.positions
-    //-                 each candidate in election.candidates
-    //-                     if(candidate.position.name == e.name)
-    //-                         tr
-    //-                             td.id= String(candidate.id)
-    //-                             td.position= e.name
-    //-                             td 
-    //-                                 input.name(type="text" value=candidate.name)
-    //-                             td
-    //-                                 button.update-candidate-name Update
-    //-                                 button.remove-candidate Remove
+            tbody
+                each e in election.positions
+                    each candidate in election.candidates
+                        if(candidate.position == e.name)
+                            tr
+                                td.id= String(candidate.id)
+                                td.position= e.name
+                                td 
+                                    input.name(type="text" value=candidate.name)
+                                td
+                                    button.update-candidate-name Update
+                                    button.remove-candidate Remove
     
     script(src="/scripts/admin-jq.js" type='text/javascript')

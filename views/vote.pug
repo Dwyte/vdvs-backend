@@ -26,7 +26,7 @@ block appContent
                 -if(position.winnerQty > 1){inputType = "checkbox"}
 
                 each candidate in candidates
-                    if(candidate.position.name == position.name)
+                    if(candidate.position == position.name)
                         label= candidate.name
                             input(type=inputType name=position.name value=candidate.id)
                         br

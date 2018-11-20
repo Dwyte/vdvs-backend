@@ -36,7 +36,7 @@ $(() => {
             data: JSON.stringify({newName: newName}),
             success: (response) => {
                 console.log(response);
-                //location.reload();
+                location.reload();
             }
         })
     });
@@ -55,7 +55,7 @@ $(() => {
             method: 'DELETE',
             success: (response) => {
                 console.log(response);
-                //location.reload();
+                location.reload();
             }
         })
     });
