@@ -33,7 +33,7 @@ block appContent
                     each candidate in election.candidates
                         if(candidate.position == e.name)
                             tr
-                                td.id= String(candidate.id)
+                                td.id= String(candidate._id).substr(0, 6)
                                 td.position= e.name
                                 td 
                                     input.name(type="text" value=candidate.name)

@@ -1,10 +1,13 @@
 const mongoose = require('mongoose');
 
 const voterSchema = mongoose.Schema({
-    lrn: Number,
-    fullName: String,
+    lrn: {type: Number, required: true},
+    firstName: String,
+    middleName: String,
+    lastName: String,
     gradeLevel: Number,
     section: String,
+    canVote: Boolean,
     voteReceiptID: String
 })
 

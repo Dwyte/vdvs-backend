@@ -28,7 +28,7 @@ block appContent
                 each candidate in candidates
                     if(candidate.position == position.name)
                         label= candidate.name
-                            input(type=inputType name=position.name value=candidate.id)
+                            input(type=inputType name=position.name value=candidate._id)
                         br
         button#ballot-submit-button Submit
 

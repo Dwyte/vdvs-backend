@@ -1,78 +1,54 @@
-const SHA256 = require('crypto-js/sha256');
-
-// Server
 const express = require('express');
 const router = express.Router();
 
-// Database & Models
-const mongoose = require('mongoose');
+// Models
+const Voter = require('../models/voter.js');
 const Candidate = require('../models/candidate.js');
-const Position = require('../models/position.js');
 
+router.get('/searchVoter/:lrn', async (req, res) => {
+    const voter = await Voter.findOne({lrn: req.params.lrn});
 
-// Render Admin Dashboard
-router.get('/', async (req, res) => {
-    const candidates = await Candidate.find();
-    const positions = await Position.find();
+    if(!voter)
+        res.send('Voter not found.');
 
-    res.render('../views/admin.pug', {election: {positions: positions, candidates: candidates}});
+    res.send(voter);
 });
 
-// Nominate new candidate
-router.put('/nominate/', async (req, res) => {
-    var position = await Position.findOne({name: req.body.positionName.replace(/\s/g, '').toLowerCase()})
+router.put('/activateVoter/:lrn', async (req, res) => {
+    const voter = await Voter.findOneAndUpdate({lrn: parseInt(req.params.lrn)});
 
-    if(!position){
-        position = new Position({ 
-            name: req.body.positionName.replace(/\s/g, '').toLowerCase(),
-            winnerQty: req.body.winnerQty,
-        });
-        const newPosition = await position.save();
-        console.log("New Position:", newPosition);
-    }else{
-        console.log("Position Exists");
-    }
+    if(!voter)
+        res.send('Voter not found.');
 
-    var candidate = await Candidate.findOne({name: req.body.candidateName.replace(/\s/g, '').toLowerCase()})
+    voter.canVote = true;
+
+    const activatedVoter = await voter.save();
+
+    res.send(activatedVoter);
+});
+
+router.post('/nominateCandidate', async (req, res) => {
+    var candidate = await Candidate.findOne({lrn: req.body.lrn})
 
     if(candidate){
-        console.log(`${req.body.candidateName} is already nominated: ${candidate}`);
-    }else{
-        candidate = new Candidate({
-            id: SHA256(req.body.candidateName + Date.now()).toString().substr(0,6),
-            name: req.body.candidateName.replace(/\s/g, '').toLowerCase(),
-            position: position.name,
-            votes: 0,
-        })
+        res.send(`Candidate was already nominated as ${candidate.position}.`);
+        return;
+    }
 
-        const newCandidate = await candidate.save()
-        console.log("Candidate Created:", newCandidate)
-    };
+    candidate = new Candidate({
+        lrn: req.body.lrn,
+        firstName: req.body.firstName,
+        middleName: req.body.middleName,
+        lastName: req.body.lastName,
+        gradeLevel: req.body.gradeLevel,
+        section: req.body.section,
+        position: req.body.position,
+        votes: 0
+    });
 
-    res.send("Candidate Nominated");
-});
-
-// Update Candidate Name
-router.put('/update/:candidateID', async (req, res) => {
-    const result = await Candidate.update({id: req.params.candidateID},{
-        $set:{
-            name: req.body.newName.replace(/\s/g, '').toLowerCase(),
-            id: SHA256(req.body.candidateName + Date.now()).toString().substr(0,6)
-        }
-    })
-
-    console.log(result);
-
-    res.send("Updated Candidate Name");
-});
-
-// Remove Candidate
-router.delete('/remove/:candidateID', async (req, res) => {
-    const result = await Candidate.deleteOne({id: req.params.candidateID})
-
-    console.log(result);
-
-    res.send("Candidate Removed");
+    const nomindatedCandidate = await candidate.save()
+        .then(product => res.send(product))
+        .catch(error => res.send(error.message));
 });
 
 module.exports = router;

@@ -22,7 +22,7 @@ $(() => {
             data: JSON.stringify({info:voterInfo,votes: voterVotes}),
             success: (response) => {
                 console.log(response);
-                location.replace('vote/receipt/' + response);
+                location.replace('/vote/receipt/' + response);
             }
         })
     });

@@ -28,7 +28,7 @@ router.get('/receipt/:voterReceiptLRN', async (req, res) => {
     if(!receipt){
         res.send('Receipt not found');
         return;
-    }
+    }7
 
     receipt.votedCandidates.forEach(id => {
         
@@ -41,11 +41,15 @@ router.get('/receipt/:voterReceiptLRN', async (req, res) => {
 router.put('/', async (req, res) => {
 
     // Check if the Voter is registered in DB, and verify if all info's match.
-    const voter = await GetVoterFromDB(req.body.info)
+    const voter = await Voter.findOneAndUpdate({lrn: parseInt(req.body.lrn)});
 
-    // If not, cancel operation.
-    if(voter == null){
-        res.send('Voter was not found in the database, pleace double check your info.');
+    if(!voter){
+        res.send("Voter was not found from the database");
+        return;
+    }
+
+    if(!ValidateVoterInformation(req.body.info, voter)){
+        res.send("Voter Validation Failed");
         return;
     }
 
@@ -59,9 +63,8 @@ router.put('/', async (req, res) => {
     console.log("VOTES:",JSON.stringify(votes))
     var votedCandidates = [];
 
-    votes.forEach(async (vote) => {
-        //var votedCandidate = election.candidates.find(c => c.id === vote);
-        var votedCandidate = await Candidate.findOneAndUpdate({id:vote})
+    for(i = 0; i < votes.length; i++){
+        var votedCandidate = await Candidate.findOneAndUpdate({id:votes[i]});
 
         if(!votedCandidate)
             console.log("Candidate Not Found!");
@@ -74,8 +77,8 @@ router.put('/', async (req, res) => {
 
         console.log("BEFORE:", JSON.stringify(result));
 
-        votedCandidates.push(votedCandidate.id);
-    });
+        votedCandidates.push(result._id);
+    }
 
     console.log("VOTES:",JSON.stringify(votedCandidates))
 
@@ -97,30 +100,24 @@ async function hasVoterAlreadyVoted(voterLRN){
     return await Voter.findOne({lrn: parseInt(voterLRN)}).voteReceiptID != null;
 }
 
-async function GetVoterFromDB(voterInfo){
+async function ValidateVoterInformation(voterInfo, voterFromDataBase){
     //const voterFromDataBase = voters.find(v => v.lrn === parseInt(voterInfo.lrn));
-    const voterFromDataBase = await Voter.findOneAndUpdate({lrn: parseInt(voterInfo.lrn)});
-
-    if(!voterFromDataBase){
-        console.log("Voter is not registered onto the database");
-        return null;
-    }
 
     if(voterInfo.fullName != voterFromDataBase.fullName){
         console.log("Name Doesn't matched");
-        return null;
+        return false;
     }
     if(voterInfo.gradeLevel != voterFromDataBase.gradeLevel){
         console.log("Grade Level Doesn't matched");
-        return null;
+        return false;
     }
 
     if(voterInfo.section != voterFromDataBase.section){
         console.log("Section Doesn't matched");
-        return null;
+        return false;
     }
     
-    return voterFromDataBase;
+    return true;
 }
 
 
