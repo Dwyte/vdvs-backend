@@ -5,6 +5,7 @@ const router = express.Router();
 const Voter = require('../models/voter.js');
 const Candidate = require('../models/candidate.js');
 
+// Get voter of lrn
 router.get('/searchVoter/:lrn', async (req, res) => {
     const voter = await Voter.findOne({lrn: req.params.lrn});
 
@@ -14,19 +15,19 @@ router.get('/searchVoter/:lrn', async (req, res) => {
     res.send(voter);
 });
 
+// Activate voter of lrn
 router.put('/activateVoter/:lrn', async (req, res) => {
-    const voter = await Voter.findOneAndUpdate({lrn: parseInt(req.params.lrn)});
+    const voter = await Voter.findOneAndUpdate({lrn: parseInt(req.params.lrn)}, {canVote: true}, {new: true});
 
-    if(!voter)
-        res.send('Voter not found.');
-
-    voter.canVote = true;
-
-    const activatedVoter = await voter.save();
-
-    res.send(activatedVoter);
+    if(!voter){
+        res.send('Voter was not found from the database...');
+    }else{
+        const activatedVoter = await voter.save();
+        res.send(activatedVoter);
+    }
 });
 
+// Nominate new candidate
 router.post('/nominateCandidate', async (req, res) => {
     var candidate = await Candidate.findOne({lrn: req.body.lrn})
 
