@@ -47,9 +47,42 @@ router.post('/nominateCandidate', async (req, res) => {
         votes: 0
     });
 
-    const nomindatedCandidate = await candidate.save()
+    candidate.save()
         .then(product => res.send(product))
         .catch(error => res.send(error.message));
+});
+
+// Update candidate
+router.put('/updateCandidate', async (req, res) => {
+    const  candidate = await Candidate.findOneAndUpdate({_id: req.body._id},{
+        lrn: req.body.lrn,
+        firstName: req.body.firstName,
+        middleName: req.body.middleName,
+        lastName: req.body.lastName,
+        gradeLevel: req.body.gradeLevel,
+        section: req.body.section,
+        position: req.body.position,
+    })
+
+    if(!candidate){
+        res.send("Candidate was not found from the database");
+        return;
+    }
+
+    candidate.save()
+        .then(product => res.send(product))
+        .catch(error => res.send(error.message));
+});
+
+// Remove Candidate
+router.delete('/removeCandidate/:id', async (req, res) => {
+    Candidate.deleteOne({_id: req.params.id},(error) => {
+        if(error){
+            res.send(error);
+            return;
+        }
+        res.send("Candidate removed");
+    });
 });
 
 module.exports = router;
