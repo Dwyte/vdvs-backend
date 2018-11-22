@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const {Candidate, validateCandidate} = require('../models/candidate.js');
+const {Candidate, validateCandidate} = require('../models/candidate');
 
 // GET ALL CANDIDATES
 router.get('/', async (req, res) => {
@@ -55,7 +55,7 @@ router.put('/updateCandidate/:id', async (req, res) => {
         gradeLevel: req.body.gradeLevel,
         section: req.body.section,
         position: req.body.position,
-    })
+    },{useFindAndModify: false,new: true})
 
     if(!candidate)
         return res.status(404).send('Candidate with the given id was not found from the database.');

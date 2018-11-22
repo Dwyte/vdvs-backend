@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 // Models
-const {Voter, validateVoter} = require('../models/voter.js');
+const {Voter, validateVoter} = require('../models/voter');
 
 router.get('/', (req, res) => {
     res.send('Testing');

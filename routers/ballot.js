@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-const Candidate = require('../models/candidate.js').Candidate;
-const Receipt = require('../models/receipt.js').Receipt;
-const Voter = require('../models/voter.js').Voter;
+const Candidate = require('../models/candidate').Candidate;
+const Receipt = require('../models/receipt').Receipt;
+const Voter = require('../models/voter').Voter;
 
 // GET ALL CANDIDATES
 router.get('/', async (req, res) => {
