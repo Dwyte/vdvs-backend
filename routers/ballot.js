@@ -50,20 +50,34 @@ router.put('/submitVote', async (req, res) => {
         if(result.voteReceiptID != null)
             return res.status(401).send('Voter has already voted');
         
-        recordVotes(req.body.votes);
+        error = await recordVotes(req.body.votes);
+        if(error)
+            return res.status(404).send(error);
+
         res.send(await createReceipt(result, req.body.votes));
     });
 });
 
 async function recordVotes(votes){
-    for(i = 0; i < votes.length;i++){
-        const candidate = await Candidate.findOneAndUpdate(
-            {lrn: votes[i]}, 
-            {$inc:{votes: 1}}, 
-            {useFindAndModify:false});
+    candidatesVoted = [];
 
-        candidate.save();
+    // Validation: Look for the candidates first..
+    for(i = 0; i < votes.length;i++){
+        const candidate = await Candidate.findOne({lrn: votes[i].lrn, position: votes[i].position});
+
+        if(!candidate)
+            return `No candidate with the LRN of ${votes[i].lrn} was nominated as ${votes[i].position}`;
+
+        candidatesVoted.push(candidate);
     }
+
+    // If all of them are existing and valid, now record the votes
+    candidatesVoted.forEach(candidate => {
+        candidate.votes += 1;
+        candidate.save();
+    });
+
+    return null;
 }
 
 async function createReceipt(voter, votesArray){

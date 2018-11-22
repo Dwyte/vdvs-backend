@@ -3,8 +3,8 @@ const Joi = require('joi');
 
 const receiptSchema = mongoose.Schema({
     lrn: {type: Number, require: true},
-    timestamp: {type: String, require: true},
-    votedCandidates: {type: [String], require: true}
+    timestamp: {type: Date, require: true},
+    votedCandidates: {type: [Object], require: true}
 })
 
 const Receipt = mongoose.model('Receipt', receiptSchema);
