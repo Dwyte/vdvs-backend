@@ -2,15 +2,15 @@ const express = require('express');
 const router = express.Router();
 
 // Models
-const Voter = require('../models/voter.js');
-const Candidate = require('../models/candidate.js');
+const {Voter, validateVoter} = require('../models/voter.js');
+const {Candidate, validateCandidate} = require('../models/candidate.js');
 
 // Get voter of lrn
 router.get('/searchVoter/:lrn', async (req, res) => {
     const voter = await Voter.findOne({lrn: req.params.lrn});
 
     if(!voter)
-        res.send('Voter not found.');
+        return res.status(404).send('The voter with the given lrn was not found');
 
     res.send(voter);
 });
@@ -19,23 +19,27 @@ router.get('/searchVoter/:lrn', async (req, res) => {
 router.put('/activateVoter/:lrn', async (req, res) => {
     const voter = await Voter.findOneAndUpdate({lrn: parseInt(req.params.lrn)}, {canVote: true}, {new: true});
 
-    if(!voter){
-        res.send('Voter was not found from the database...');
-    }else{
-        const activatedVoter = await voter.save();
-        res.send(activatedVoter);
-    }
+    if(!voter)
+        return res.status(404).send('Voter was not found from the database...');
+
+    const activatedVoter = await voter.save();
+    res.send(activatedVoter);
 });
 
 // Nominate new candidate
 router.post('/nominateCandidate', async (req, res) => {
-    var candidate = await Candidate.findOne({lrn: req.body.lrn})
+    // Validate sent data
+    const {error} = validateCandidate(req.body);
+    if(error)
+        return res.status(400).send(error.details[0].message);
 
-    if(candidate){
-        res.send(`Candidate was already nominated as ${candidate.position}.`);
-        return;
-    }
+    // Look if candidate with lrn already nominated
+    let candidate = await Candidate.findOne({lrn: req.body.lrn})
+    if(candidate)
+        return res.send(`Candidate was already nominated as ${candidate.position}.`);
 
+
+    // Nominate Candidate
     candidate = new Candidate({
         lrn: req.body.lrn,
         firstName: req.body.firstName,
@@ -46,15 +50,20 @@ router.post('/nominateCandidate', async (req, res) => {
         position: req.body.position,
         votes: 0
     });
+    candidate = await candidate.save();
 
-    candidate.save()
-        .then(product => res.send(product))
-        .catch(error => res.send(error.message));
+    res.send(candidate);
 });
 
 // Update candidate
-router.put('/updateCandidate', async (req, res) => {
-    const  candidate = await Candidate.findOneAndUpdate({_id: req.body._id},{
+router.put('/updateCandidate/:id', async (req, res) => {
+    // Validate sent data
+    const {error} = validateCandidate(req.body);
+    if(error)
+        return res.status(400).send(error.details[0].message);
+
+    // find candidate with given id, and Update
+    let  candidate = await Candidate.findOneAndUpdate({_id: req.params.id},{
         lrn: req.body.lrn,
         firstName: req.body.firstName,
         middleName: req.body.middleName,
@@ -64,25 +73,21 @@ router.put('/updateCandidate', async (req, res) => {
         position: req.body.position,
     })
 
-    if(!candidate){
-        res.send("Candidate was not found from the database");
-        return;
-    }
+    if(!candidate)
+        return res.status(404).send("Candidate with the given id was not found from the database.");
 
-    candidate.save()
-        .then(product => res.send(product))
-        .catch(error => res.send(error.message));
+    candidate = await candidate.save();
+    res.send(candidate);
 });
 
 // Remove Candidate
 router.delete('/removeCandidate/:id', async (req, res) => {
-    Candidate.deleteOne({_id: req.params.id},(error) => {
-        if(error){
-            res.send(error);
-            return;
-        }
-        res.send("Candidate removed");
-    });
+    const candidate = await Candidate.findByIdAndRemove(req.params.id);
+
+    if(!candidate)
+        return res.status(404).send("Candidate with the given id was not found.");
+
+    res.send("Candidate removed.");
 });
 
 module.exports = router;

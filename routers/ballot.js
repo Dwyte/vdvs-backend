@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-const Candidate = require('../models/candidate.js');
-const Receipt = require('../models/receipt.js');
-const Voter = require('../models/voter.js');
+const Candidate = require('../models/candidate.js').Candidate;
+const Receipt = require('../models/receipt.js').Receipt;
+const Voter = require('../models/voter.js').Voter;
 
 // GET ALL CANDIDATES
 router.get('/', async (req, res) => {
@@ -22,23 +22,24 @@ router.put('/submitVote', async (req, res) => {
         gradeLevel: req.body.gradeLevel,
         section: req.body.section,
     }, async (error, result) => {
-        if(error){
-            res.send(error);
-            return;
-        }else if(!result){
-            res.send('Voter was not found  from the database..');
-        }else if(!result.canVote){
-            res.send('Voter cannot vote yet, contact admin for activation');
-        }else if(result.voteReceiptID != null){
-            res.send('Voter has already voted');
-        }else{
-            RecordVotes(req.body.votes);
-            res.send(await CreateReceipt(result, req.body.votes));
-        }
+        if(error)
+            return res.send(error);
+            
+        if(!result)
+            return res.status(404).send('Voter was not found  from the database..');
+
+        if(!result.canVote)
+            return res.status(400).send('Voter cannot vote yet, contact admin for activation');
+
+        if(result.voteReceiptID != null)
+            return res.status(401).send('Voter has already voted');
+        
+        recordVotes(req.body.votes);
+        res.send(await createReceipt(result, req.body.votes));
     });
 });
 
-async function RecordVotes(votes){
+async function recordVotes(votes){
     for(i = 0; i < votes.length;i++){
         const candidate = await Candidate.findOneAndUpdate(
             {lrn: votes[i]}, 
@@ -49,7 +50,7 @@ async function RecordVotes(votes){
     }
 }
 
-async function CreateReceipt(voter, votesArray){
+async function createReceipt(voter, votesArray){
     const receipt = new Receipt({
         lrn: voter.lrn,
         timestamp: new Date,
