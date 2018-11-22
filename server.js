@@ -1,5 +1,6 @@
 // Routers
-const admin = require('./routers/admin.js');
+const candidates = require('./routers/candidates');
+const voters = require('./routers/voters')
 const ballot = require('./routers/ballot');
 
 // Server
@@ -16,7 +17,8 @@ mongoose.connect('mongodb://localhost/vdvs-dev', {useNewUrlParser: true})
     .catch((error) => console.log('Unable to connect to MongoDB.', error));
 
 // Routes
-server.use('/admin', admin);
+server.use('/admin/voters', voters)
+server.use('/admin/candidates', candidates);
 server.use('/ballot', ballot);
 
 

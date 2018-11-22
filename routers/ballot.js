@@ -7,7 +7,23 @@ const Voter = require('../models/voter.js').Voter;
 
 // GET ALL CANDIDATES
 router.get('/', async (req, res) => {
-    const candidates = await Candidate.find();
+    const presidentCandidates = await Candidate
+        .find({position: "President"})
+        .sort({gradeLevel: -1});
+
+    const vicePresCandidates = await Candidate
+        .find({position: "Vice President"})
+        .sort({gradeLevel: -1});
+
+    const secretaryCandidates = await Candidate
+        .find({position: "Secretary"})
+        .sort({gradeLevel: -1});
+
+    const candidates = {
+        presidents: presidentCandidates,
+        vicePresidents: vicePresCandidates,
+        secretaries: secretaryCandidates
+    }
 
     res.send(candidates)
 });

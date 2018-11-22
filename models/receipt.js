@@ -21,5 +21,5 @@ function validateReceipt(receipt){
 
 module.exports = {
     Receipt: Receipt,
-    validate: validateReceipt
+    validateReceipt: validateReceipt
 };

@@ -1,29 +1,13 @@
 const express = require('express');
 const router = express.Router();
 
-// Models
-const {Voter, validateVoter} = require('../models/voter.js');
 const {Candidate, validateCandidate} = require('../models/candidate.js');
 
-// Get voter of lrn
-router.get('/searchVoter/:lrn', async (req, res) => {
-    const voter = await Voter.findOne({lrn: req.params.lrn});
+// GET ALL CANDIDATES
+router.get('/', async (req, res) => {
+    const candidates = await Candidate.find();
 
-    if(!voter)
-        return res.status(404).send('The voter with the given lrn was not found');
-
-    res.send(voter);
-});
-
-// Activate voter of lrn
-router.put('/activateVoter/:lrn', async (req, res) => {
-    const voter = await Voter.findOneAndUpdate({lrn: parseInt(req.params.lrn)}, {canVote: true}, {new: true});
-
-    if(!voter)
-        return res.status(404).send('Voter was not found from the database...');
-
-    const activatedVoter = await voter.save();
-    res.send(activatedVoter);
+    res.send(candidates)
 });
 
 // Nominate new candidate
@@ -36,7 +20,7 @@ router.post('/nominateCandidate', async (req, res) => {
     // Look if candidate with lrn already nominated
     let candidate = await Candidate.findOne({lrn: req.body.lrn})
     if(candidate)
-        return res.send(`Candidate was already nominated as ${candidate.position}.`);
+        return res.status(403).send(`Candidate was already nominated as ${candidate.position}.`);
 
 
     // Nominate Candidate
@@ -74,7 +58,7 @@ router.put('/updateCandidate/:id', async (req, res) => {
     })
 
     if(!candidate)
-        return res.status(404).send("Candidate with the given id was not found from the database.");
+        return res.status(404).send('Candidate with the given id was not found from the database.');
 
     candidate = await candidate.save();
     res.send(candidate);
@@ -85,9 +69,9 @@ router.delete('/removeCandidate/:id', async (req, res) => {
     const candidate = await Candidate.findByIdAndRemove(req.params.id);
 
     if(!candidate)
-        return res.status(404).send("Candidate with the given id was not found.");
+        return res.status(404).send('Candidate with the given id was not found.');
 
-    res.send("Candidate removed.");
+    res.send('Candidate removed.');
 });
 
 module.exports = router;
