@@ -37,7 +37,7 @@ router.put('/submitVote', async (req, res) => {
         return res.status(404).send('No on-going election found.');
 
     if(!election.hasBegun)
-        return res.status(400).send('Election has not yet started..' + election.hasBegun);
+        return res.status(400).send('Election has not yet started..');
 
     // Validate Voter
     Voter.findOne({

@@ -29,10 +29,10 @@ router.put('/endElection', async (req, res) => {
     const election = await Election.findOneAndUpdate({},
         {
             hasEnded: true,
-            results: {
+            winners: {
                 President: await Candidate.find({position: "President"}).sort({votes: -1}).limit(1),
-                VicePresident: await Candidate.find({position: "Vice President"}).sort({votes: -1}),
-                Secretary: await Candidate.find({position: "Secretary"}).sort({votes: -1})
+                VicePresident: await Candidate.find({position: "Vice President"}).sort({votes: -1}).limit(1),
+                Secretary: await Candidate.find({position: "Secretary"}).sort({votes: -1}).limit(1)
             }
         },
         {useFindAndModify: false, new: true});

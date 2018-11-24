@@ -1,12 +1,42 @@
 const express = require('express');
 const router = express.Router();
+const excelToJson = require('convert-excel-to-json');
 
 // Models
 const {Voter, validateVoter} = require('../models/voter');
 
-router.get('/', (req, res) => {
-    res.send('Testing');
+router.post('/import', (req, res) => {
+    const result = excelToJson({
+        sourceFile: req.body.sourceFile,
+        header: {
+            rows: 1
+        },
+        columnToKey:{
+            A: 'lrn',
+            B: 'firstName',
+            C: 'middleName',
+            D: 'lastName',
+            E: 'gradeLevel',
+            F: 'section'
+        }
+    });
+
+    result.Sheet1.forEach(element => {
+        const voter = new Voter({
+            lrn: element.lrn,
+            firstName: element.firstName,
+            middleName: element.middleName || null,
+            lastName: element.lastName,
+            gradeLevel: element.gradeLevel,
+            section: element.section
+        });
+
+        voter.save();
+    });
+
+    res.send(result);
 });
+
 
 // Get voter of lrn
 router.get('/searchVoter/:lrn', async (req, res) => {
