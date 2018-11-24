@@ -4,7 +4,7 @@ const Joi = require('joi');
 const electionSchema = new mongoose.Schema({
     hasBegun: {type: Boolean, default: false},
     hasEnded: {type: Boolean, default: false},
-    results: {type: [String] , default: []}
+    winners: {type: [Object] , default: []}
 });
 
 const Election = mongoose.model('Election', electionSchema);

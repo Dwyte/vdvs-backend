@@ -2,14 +2,37 @@ const mongoose = require('mongoose');
 const Joi = require('joi');
 
 const voterSchema = mongoose.Schema({
-    lrn: {type: Number, require: true},
-    firstName: {type: String, require: true},
+    lrn: {
+        type: Number,
+        require: true
+    },
+    firstName: {
+        type: String,
+        require: true
+    },
     middleName: String,
-    lastName: {type: String, require: true},
-    gradeLevel: {type: Number, min: 7, max: 12, require: true},
-    section: {type: String, require: true},
-    canVote: {type: Boolean, default: false},
-    voteReceiptID: {type: String, default: null}
+    lastName: {
+        type: String,
+        require: true},
+    gradeLevel: {
+        type: Number,
+        min: 7,
+        max: 12,
+        require: true
+    },
+    section: {
+        type: String,
+        require: true
+    },
+    canVote: {
+        type: Boolean,
+        default: false
+    },
+    voteReceiptID: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Receipt',
+        default: null
+    }
 });
 
 const Voter = mongoose.model('Voter', voterSchema);

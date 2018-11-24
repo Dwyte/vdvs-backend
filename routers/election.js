@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 const Election = require('../models/election');
-const Candidate = require('../models/candidate');
+const {Candidate, validateCandidate} = require('../models/candidate');
 
 router.post('/createElection', async (req, res) => {
     let election = await Election.findOne();
@@ -26,12 +26,19 @@ router.put('/beginElection', async (req, res) => {
 });
 
 router.put('/endElection', async (req, res) => {
-    let election = await Election.findOneAndUpdate({},{hasEnded: true},{useFindAndModify: false, new: true});
+    const election = await Election.findOneAndUpdate({},
+        {
+            hasEnded: true,
+            results: {
+                President: await Candidate.find({position: "President"}).sort({votes: -1}).limit(1),
+                VicePresident: await Candidate.find({position: "Vice President"}).sort({votes: -1}),
+                Secretary: await Candidate.find({position: "Secretary"}).sort({votes: -1})
+            }
+        },
+        {useFindAndModify: false, new: true});
 
     if(!election)
         return res.status(404).send('There is no current election.');
-
-    // Manage Results
 
     res.send(election);
 });

@@ -2,9 +2,14 @@ const mongoose = require('mongoose');
 const Joi = require('joi');
 
 const receiptSchema = mongoose.Schema({
-    lrn: {type: Number, require: true},
-    timestamp: {type: Date, require: true},
-    votedCandidates: {type: [Object], require: true}
+    lrn: {
+        type: Number,
+        require: true
+    },
+    votedCandidates: {
+        type: [Object],
+        require: true
+    }
 })
 
 const Receipt = mongoose.model('Receipt', receiptSchema);

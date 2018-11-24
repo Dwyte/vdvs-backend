@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
 
 // Get voter of lrn
 router.get('/searchVoter/:lrn', async (req, res) => {
-    const voter = await Voter.findOne({lrn: req.params.lrn});
+    const voter = await Voter.findOne({lrn: req.params.lrn}).populate('voteReceiptID');
 
     if(!voter)
         return res.status(404).send('The voter with the given lrn was not found');

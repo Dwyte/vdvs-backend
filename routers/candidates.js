@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 
 const {Candidate, validateCandidate} = require('../models/candidate');
+const Election = require('../models/election');
 
 // GET ALL CANDIDATES
 router.get('/', async (req, res) => {
@@ -12,6 +14,13 @@ router.get('/', async (req, res) => {
 
 // Nominate new candidate
 router.post('/nominateCandidate', async (req, res) => {
+    const election = await Election.findOne();
+    if(!election)
+        return res.status(404).send('No Election Found... Create one first..');
+
+    if(election.hasBegun)
+        return res.status(400).send('Sorry, election already started.');
+
     // Validate sent data
     const {error} = validateCandidate(req.body);
     if(error)
@@ -41,6 +50,13 @@ router.post('/nominateCandidate', async (req, res) => {
 
 // Update candidate
 router.put('/updateCandidate/:id', async (req, res) => {
+    const election = await Election.findOne();
+    if(!election)
+        return res.status(404).send('No Election Found... Create one first..');
+
+    if(election.hasBegun)
+        return res.status(400).send('Sorry, election already started.');
+
     // Validate sent data
     const {error} = validateCandidate(req.body);
     if(error)
@@ -66,6 +82,14 @@ router.put('/updateCandidate/:id', async (req, res) => {
 
 // Remove Candidate
 router.delete('/removeCandidate/:id', async (req, res) => {
+    const election = await Election.findOne();
+    if(!election)
+        return res.status(404).send('No Election Found... Create one first..');
+
+    if(election.hasBegun)
+        return res.status(400).send('Sorry, election already started.');
+
+
     const candidate = await Candidate.findByIdAndRemove(req.params.id);
 
     if(!candidate)

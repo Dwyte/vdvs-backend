@@ -4,6 +4,7 @@ const router = express.Router();
 const Candidate = require('../models/candidate').Candidate;
 const Receipt = require('../models/receipt').Receipt;
 const Voter = require('../models/voter').Voter;
+const Election = require('../models/election');
 
 // GET ALL CANDIDATES
 router.get('/', async (req, res) => {
@@ -30,6 +31,15 @@ router.get('/', async (req, res) => {
 
 // RECORD VOTES
 router.put('/submitVote', async (req, res) => {
+    const election = await Election.findOne();
+
+    if(!election)
+        return res.status(404).send('No on-going election found.');
+
+    if(!election.hasBegun)
+        return res.status(400).send('Election has not yet started..' + election.hasBegun);
+
+    // Validate Voter
     Voter.findOne({
         lrn: req.body.lrn,
         firstName: req.body.firstName,
@@ -58,6 +68,13 @@ router.put('/submitVote', async (req, res) => {
     });
 });
 
+//Show Receipt
+router.get('/success/:receiptID', async (req, res) => {
+    const receipt = await Receipt.findById(req.params.receiptID);
+
+    res.send(receipt);
+});
+
 async function recordVotes(votes){
     candidatesVoted = [];
 
@@ -83,7 +100,6 @@ async function recordVotes(votes){
 async function createReceipt(voter, votesArray){
     const receipt = new Receipt({
         lrn: voter.lrn,
-        timestamp: new Date,
         votedCandidates: votesArray
     });
 
