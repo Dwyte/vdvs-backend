@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const Joi = require('joi');
 
 const receiptSchema = mongoose.Schema({
     lrn: {
@@ -7,24 +6,12 @@ const receiptSchema = mongoose.Schema({
         require: true
     },
     votedCandidates: {
-        type: [Object],
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'candidate',
         require: true
     }
 })
 
 const Receipt = mongoose.model('Receipt', receiptSchema);
 
-function validateReceipt(receipt){
-    const schema = {
-        lrn: Joi.number().required(),
-        timestamp: Joi.date().required(),
-        votedCandidates: Joi.array().required()
-    }
-
-    return Joi.validate(receipt, schema)
-}
-
-module.exports = {
-    Receipt: Receipt,
-    validateReceipt: validateReceipt
-};
+module.exports = Receipt;

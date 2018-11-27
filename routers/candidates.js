@@ -1,39 +1,38 @@
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose');
 
 const {Candidate, validateCandidate} = require('../models/candidate');
-const Election = require('../models/election');
 
-// GET ALL CANDIDATES
+// Get all candidates
 router.get('/', async (req, res) => {
-    const candidates = await Candidate.find();
+    const presidentCandidates = await Candidate
+    .find({position: "President"})
+    .sort({gradeLevel: -1});
 
-    res.send(candidates)
+    const vicePresCandidates = await Candidate
+        .find({position: "Vice President"})
+        .sort({gradeLevel: -1});
+
+    const secretaryCandidates = await Candidate
+        .find({position: "Secretary"})
+        .sort({gradeLevel: -1});
+
+    const candidates = {
+        presidents: presidentCandidates,
+        vicePresidents: vicePresCandidates,
+        secretaries: secretaryCandidates
+    }
+
+    res.send(candidates);
 });
 
 // Nominate new candidate
 router.post('/nominateCandidate', async (req, res) => {
-    const election = await Election.findOne();
-    if(!election)
-        return res.status(404).send('No Election Found... Create one first..');
-
-    if(election.hasBegun)
-        return res.status(400).send('Sorry, election already started.');
-
     // Validate sent data
     const {error} = validateCandidate(req.body);
-    if(error)
-        return res.status(400).send(error.details[0].message);
-
-    // Look if candidate with lrn already nominated
-    let candidate = await Candidate.findOne({lrn: req.body.lrn})
-    if(candidate)
-        return res.status(403).send(`Candidate was already nominated as ${candidate.position}.`);
-
 
     // Nominate Candidate
-    candidate = new Candidate({
+    let candidate = new Candidate({
         lrn: req.body.lrn,
         firstName: req.body.firstName,
         middleName: req.body.middleName,
@@ -43,6 +42,7 @@ router.post('/nominateCandidate', async (req, res) => {
         position: req.body.position,
         votes: 0
     });
+
     candidate = await candidate.save();
 
     res.send(candidate);
@@ -50,20 +50,13 @@ router.post('/nominateCandidate', async (req, res) => {
 
 // Update candidate
 router.put('/updateCandidate/:id', async (req, res) => {
-    const election = await Election.findOne();
-    if(!election)
-        return res.status(404).send('No Election Found... Create one first..');
-
-    if(election.hasBegun)
-        return res.status(400).send('Sorry, election already started.');
-
     // Validate sent data
     const {error} = validateCandidate(req.body);
     if(error)
         return res.status(400).send(error.details[0].message);
 
     // find candidate with given id, and Update
-    let  candidate = await Candidate.findOneAndUpdate({_id: req.params.id},{
+    let candidate = await Candidate.findOneAndUpdate({_id: req.params.id},{
         lrn: req.body.lrn,
         firstName: req.body.firstName,
         middleName: req.body.middleName,
@@ -80,22 +73,37 @@ router.put('/updateCandidate/:id', async (req, res) => {
     res.send(candidate);
 });
 
+// Record Voted Candidates
+router.put('/recordVotedCandidates', (req, res) => {
+    var candidatesVoted = [];
+
+    // Validation: Look for the candidates first..
+    for(i = 0; i < votes.length;i++){
+        const candidate = await Candidate.findOne({lrn: votes[i]});
+
+        if(!candidate)
+            return res.status(404).send(`No candidate found with the LRN of ${votes[i]}`);
+
+        candidatesVoted.push(candidate);
+    }
+
+    // If all of them are existing and valid, now record the votes
+    candidatesVoted.forEach(candidate => {
+        candidate.votes += 1;
+        candidate.save();
+    });
+
+    res.send(candidatesVoted);
+});
+
 // Remove Candidate
 router.delete('/removeCandidate/:id', async (req, res) => {
-    const election = await Election.findOne();
-    if(!election)
-        return res.status(404).send('No Election Found... Create one first..');
-
-    if(election.hasBegun)
-        return res.status(400).send('Sorry, election already started.');
-
-
     const candidate = await Candidate.findByIdAndRemove(req.params.id);
 
     if(!candidate)
         return res.status(404).send('Candidate with the given id was not found.');
 
-    res.send('Candidate removed.');
+    res.send(candidate);
 });
 
 module.exports = router;
