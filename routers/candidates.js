@@ -6,16 +6,16 @@ const {Candidate, validateCandidate} = require('../models/candidate');
 // Get all candidates
 router.get('/', async (req, res) => {
     const presidentCandidates = await Candidate
-    .find({position: "President"})
-    .sort({gradeLevel: -1});
+        .find({position: "President"})
+        .sort({votes: -1});
 
     const vicePresCandidates = await Candidate
         .find({position: "Vice President"})
-        .sort({gradeLevel: -1});
+        .sort({votes: -1});
 
     const secretaryCandidates = await Candidate
         .find({position: "Secretary"})
-        .sort({gradeLevel: -1});
+        .sort({votes: -1});
 
     const candidates = {
         presidents: presidentCandidates,
@@ -74,7 +74,8 @@ router.put('/updateCandidate/:id', async (req, res) => {
 });
 
 // Record Voted Candidates
-router.put('/recordVotedCandidates', async (req, res) => {
+router.put('/voteCandidates', async (req, res) => {
+    const votes = req.body.votes;
     var candidatesVoted = [];
 
     // Validation: Look for the candidates first..
