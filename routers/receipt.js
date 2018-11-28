@@ -11,7 +11,7 @@ router.get('/showReceipt/:receiptID', async (req, res) => {
 });
 
 // Create Receipt
-router.post('createReceipt', (req, res) => {
+router.post('createReceipt', async (req, res) => {
     const receipt = new Receipt({
         lrn: req.body.voter.lrn,
         votedCandidate: req.body.votedCandidates

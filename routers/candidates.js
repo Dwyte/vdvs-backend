@@ -74,7 +74,7 @@ router.put('/updateCandidate/:id', async (req, res) => {
 });
 
 // Record Voted Candidates
-router.put('/recordVotedCandidates', (req, res) => {
+router.put('/recordVotedCandidates', async (req, res) => {
     var candidatesVoted = [];
 
     // Validation: Look for the candidates first..

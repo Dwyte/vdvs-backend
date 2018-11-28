@@ -6,7 +6,7 @@ const Election = require('../models/election');
 const {Candidate, validateCandidate} = require('../models/candidate');
 
 // Get Election
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
     const election = await Election.findOne();
     
     if(!election)

@@ -3,13 +3,15 @@ const candidates = require('./routers/candidates');
 const voters = require('./routers/voters');
 const election = require('./routers/election');
 const receipt = require('./routers/receipt');
-
+const upload = require('express-fileupload');
 // Server
 const express = require('express');
 const app = express();
 
 // Middlewares
+app.use(upload());
 app.use(express.json());
+app.use(express.static(__dirname));
 
 // Database
 const mongoose = require('mongoose');

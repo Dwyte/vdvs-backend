@@ -7,39 +7,21 @@ const {Voter, validateVoter} = require('../models/voter');
 
 // Import Voters
 router.post('/import', (req, res) => {
-    const result = excelToJson({
-        sourceFile: req.body.sourceFile,
-        header: {
-            rows: 1
-        },
-        columnToKey:{
-            A: 'lrn',
-            B: 'firstName',
-            C: 'middleName',
-            D: 'lastName',
-            E: 'gradeLevel',
-            F: 'section'
-        }
-    });
+    var file = req.files.filename,
+        filename = file.name;
 
-    result.Sheet1.forEach(element => {
-        validateVoter(element);
-
-        const voter = new Voter({
-            lrn: element.lrn,
-            firstName: element.firstName,
-            middleName: element.middleName || null,
-            lastName: element.lastName,
-            gradeLevel: element.gradeLevel,
-            section: element.section
+    if(req.files){
+        file.mv("./uploads/"+filename, (error) => {
+            if(error)
+                return res.send("Error" + error);
+            else
+                res.send(ImportExcel(filename));
         });
-
-        voter.save();
-    });
-
-    res.send(result);
+    }
+    else{
+        return res.send("No Files");
+    }
 });
-
 
 // Get Voter with LRN
 router.get('/searchVoter/:lrn', async (req, res) => {
@@ -80,7 +62,7 @@ router.put('/activateVoter/:lrn', async (req, res) => {
 });
 
 // Validate Voter
-router.get('/validateVoter', (req, res) => {
+router.get('/validateVoter', async (req, res) => {
     Voter.findOne({
         lrn: req.body.lrn,
         firstName: req.body.firstName,
@@ -104,5 +86,42 @@ router.get('/validateVoter', (req, res) => {
         res.send(voter);
     });
 });
+
+
+function ImportExcel(filename){
+    const result = excelToJson({
+        sourceFile: './uploads/' + filename,
+        header: {
+            rows: 1
+        },
+        columnToKey:{
+            A: 'lrn',
+            B: 'firstName',
+            C: 'middleName',
+            D: 'lastName',
+            E: 'gradeLevel',
+            F: 'section'
+        }
+    });
+
+    result.Sheet1.forEach(element => {
+        validateVoter(element);
+
+        const voter = new Voter({
+            lrn: element.lrn,
+            firstName: element.firstName,
+            middleName: element.middleName || null,
+            lastName: element.lastName,
+            gradeLevel: element.gradeLevel,
+            section: element.section
+        });
+
+        voter.save();
+
+        console.log("Added Voter");
+    });
+
+    return result;
+}
 
 module.exports = router;
