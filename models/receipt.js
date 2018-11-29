@@ -1,15 +1,14 @@
 const mongoose = require('mongoose');
 
 const receiptSchema = mongoose.Schema({
-    lrn: {
+    voterLRN: {
         type: Number,
         require: true
     },
-    votedCandidates: {
-        type: [mongoose.Schema.Types.ObjectId],
-        ref: 'candidate',
+    votedCandidates: [{
+        type: Number,
         require: true
-    }
+    }]
 })
 
 const Receipt = mongoose.model('Receipt', receiptSchema);

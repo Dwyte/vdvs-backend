@@ -3,6 +3,13 @@ const router = express.Router();
 
 const {Candidate, validateCandidate} = require('../models/candidate');
 
+router.get('/:lrn', async (req, res) => {
+    const candidate = await Candidate.findOne({lrn: req.params.lrn});
+
+    res.send(candidate);
+})
+
+
 // Get all candidates
 router.get('/', async (req, res) => {
     const presidentCandidates = await Candidate
@@ -80,10 +87,10 @@ router.put('/voteCandidates', async (req, res) => {
 
     // Validation: Look for the candidates first..
     for(i = 0; i < votes.length;i++){
-        const candidate = await Candidate.findOne({lrn: votes[i]});
+        const candidate = await Candidate.findById(votes[i]);
 
         if(!candidate)
-            return res.status(404).send(`No candidate found with the LRN of ${votes[i]}`);
+            return res.status(404).send(`No candidate found with the ID of ${votes[i]}`);
 
         candidatesVoted.push(candidate);
     }

@@ -3,7 +3,6 @@ const express = require('express');
 const router = express.Router();
 
 const Election = require('../models/election');
-const {Candidate, validateCandidate} = require('../models/candidate');
 
 // Get Election
 router.get('/', async (req, res) => {

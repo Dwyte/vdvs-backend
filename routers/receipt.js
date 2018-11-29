@@ -1,26 +1,23 @@
 const express = require('express');
 const router = express.Router();
 
-const Receipt = require('../models/receipt').Receipt;
+const Receipt = require('../models/receipt');
 
 // Get Receipt
-router.get('/showReceipt/:receiptID', async (req, res) => {
-    const receipt = await Receipt.findById(req.params.receiptID);
+router.get('/:receiptID', async (req, res) => {
+    const receipt = await Receipt.findById(req.params.receiptID)
 
     res.send(receipt);
 });
 
 // Create Receipt
-router.post('createReceipt', async (req, res) => {
+router.post('/createReceipt', async (req, res) => {
     const receipt = new Receipt({
-        lrn: req.body.voter.lrn,
-        votedCandidate: req.body.votedCandidates
+        voterLRN: req.body.voterLRN,
+        votedCandidates: req.body.votes
     });
 
     const createdReceipt = await receipt.save();
-
-    req.body.voteReceiptID = createdReceipt._id;
-    voter.save();
 
     res.send(createdReceipt);
 });
