@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const auth = require('../middleware/auth');
 const express = require('express');
 const router = express.Router();
 
@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
 
 
 // Create Election
-router.post('/createElection', async (req, res) => {
+router.post('/createElection', auth, async (req, res) => {
     let election = await Election.findOne();
 
     if(election)
@@ -28,7 +28,7 @@ router.post('/createElection', async (req, res) => {
 });
 
 // Begin Election
-router.put('/beginElection', async (req, res) => {
+router.put('/beginElection', auth, async (req, res) => {
     let election = await Election.findOneAndUpdate({},{hasBegun: true},{useFindAndModify: false, new: true});
 
     if(!election)
@@ -38,7 +38,7 @@ router.put('/beginElection', async (req, res) => {
 });
 
 // End Election
-router.put('/endElection', async (req, res) => {
+router.put('/endElection', auth, async (req, res) => {
     const election = await Election.findOneAndUpdate({},
         {hasEnded: true},
         {useFindAndModify: false, new: true});
@@ -50,7 +50,7 @@ router.put('/endElection', async (req, res) => {
 });
 
 // Drop Database
-router.delete('/deleteElection', async (req,res) => {
+router.delete('/deleteElection', auth, async (req,res) => {
     let election = await Election.findOne();
 
     if(!election)

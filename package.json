@@ -1,29 +1,32 @@
 {
-  "name": "voting-system",
+  "name": "vortex-dwyte-voting-system",
   "version": "1.0.0",
-  "main": "server.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "description": "Don't forget to run **npm install** after cloning.",
+  "main": "app.js",
   "dependencies": {
+    "bcrypt": "^3.0.2",
+    "config": "^3.0.0",
     "convert-excel-to-json": "^1.5.2",
     "express": "^4.16.4",
-    "joi": "^14.1.0",
-    "mongoose": "^5.3.12",
-    "pug": "^2.0.3"
+    "express-fileupload": "^1.0.0",
+    "joi": "^14.3.0",
+    "jsonwebtoken": "^8.4.0",
+    "lodash": "^4.17.11",
+    "mongoose": "^5.3.14"
   },
   "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Dwyte/vortex-dwyte-voting-system.git"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "bugs": {
     "url": "https://github.com/Dwyte/vortex-dwyte-voting-system/issues"
   },
-  "homepage": "https://github.com/Dwyte/vortex-dwyte-voting-system#readme",
-  "description": ""
+  "homepage": "https://github.com/Dwyte/vortex-dwyte-voting-system#readme"
 }

@@ -1,3 +1,4 @@
+const auth = require('../middleware/auth');
 const express = require('express');
 const router = express.Router();
 
@@ -8,7 +9,6 @@ router.get('/:lrn', async (req, res) => {
 
     res.send(candidate);
 })
-
 
 // Get all candidates
 router.get('/', async (req, res) => {
@@ -34,10 +34,13 @@ router.get('/', async (req, res) => {
 });
 
 // Nominate new candidate
-router.post('/nominateCandidate', async (req, res) => {
+router.post('/nominateCandidate', auth, async (req, res) => {
     // Validate sent data
     const {error} = validateCandidate(req.body);
+    if(error)
+        return res.send(error);
 
+    
     // Nominate Candidate
     let candidate = new Candidate({
         lrn: req.body.lrn,
@@ -56,7 +59,7 @@ router.post('/nominateCandidate', async (req, res) => {
 });
 
 // Update candidate
-router.put('/updateCandidate/:id', async (req, res) => {
+router.put('/updateCandidate/:id', auth, async (req, res) => {
     // Validate sent data
     const {error} = validateCandidate(req.body);
     if(error)
@@ -105,7 +108,7 @@ router.put('/voteCandidates', async (req, res) => {
 });
 
 // Remove Candidate
-router.delete('/removeCandidate/:id', async (req, res) => {
+router.delete('/removeCandidate/:id', auth, async (req, res) => {
     const candidate = await Candidate.findByIdAndRemove(req.params.id);
 
     if(!candidate)

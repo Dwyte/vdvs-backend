@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const receiptSchema = mongoose.Schema({
     voterLRN: {
         type: Number,
-        require: true
+        require: true,
+        unique: true
     },
     votedCandidates: [{
         type: Number,

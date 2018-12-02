@@ -1,0 +1,5 @@
+{
+    "database": "mongodb://localhost/vdvs-dev",
+    "port": 3000,
+    "jsonTokenPrivKey": "vdvs_SscurePrivateKey"
+}

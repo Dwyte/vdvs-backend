@@ -1,3 +1,4 @@
+const auth = require('../middleware/auth');
 const express = require('express');
 const router = express.Router();
 const excelToJson = require('convert-excel-to-json');
@@ -6,7 +7,7 @@ const excelToJson = require('convert-excel-to-json');
 const {Voter, validateVoter} = require('../models/voter');
 
 // Import Voters
-router.post('/import', (req, res) => {
+router.post('/import', auth, async (req, res) => {
     if(req.files){
         var file = req.files.file,
             filename = file.name;
@@ -44,7 +45,7 @@ router.get('/totalVoters', async(req, res) => {
 });
 
 // Activate Voter with Lrn
-router.put('/activateVoter/:lrn', async (req, res) => {
+router.put('/activateVoter/:lrn',auth, async (req, res) => {
     const voter = await Voter.findOneAndUpdate(
         {lrn: parseInt(req.params.lrn)}, 
         {canVote: true}, 

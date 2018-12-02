@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Joi = require('joi');
 
 const candidateSchema = new mongoose.Schema({
-    lrn: {type:Number, require: true},
+    lrn: {type:Number, require: true, unique: true},
     firstName: {type: String, require: true},
     middleName: String,
     lastName: {type: String, require: true},

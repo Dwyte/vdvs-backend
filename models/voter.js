@@ -4,7 +4,8 @@ const Joi = require('joi');
 const voterSchema = mongoose.Schema({
     lrn: {
         type: Number,
-        require: true
+        require: true,
+        unique: true
     },
     firstName: {
         type: String,
