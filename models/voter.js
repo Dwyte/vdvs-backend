@@ -1,3 +1,5 @@
+const config = require('config');
+const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const Joi = require('joi');
 
@@ -38,7 +40,11 @@ const voterSchema = mongoose.Schema({
 
 const Voter = mongoose.model('Voter', voterSchema);
 
-function validateVoter(voter){
+function generateAuthToken() {
+    return jwt.sign({_id: this._id, isAdmin: false}, config.get('jsonTokenPrivKey'));
+}
+
+function validate(voter){
     const schema = {
         lrn: Joi.number().required(),
         firstName: Joi.string().required(),
@@ -55,5 +61,6 @@ function validateVoter(voter){
 
 module.exports = {
     Voter: Voter,
-    validateVoter: validateVoter
+    validate: validate,
+    generateToken: generateAuthToken
 };

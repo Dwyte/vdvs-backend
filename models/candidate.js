@@ -14,7 +14,7 @@ const candidateSchema = new mongoose.Schema({
 
 const Candidate = mongoose.model('Candidate', candidateSchema);
 
-function validateCandidate(candidate){
+function validate(candidate){
     const schema = {
         lrn: Joi.number().required(),
         firstName: Joi.string().required(),
@@ -31,5 +31,5 @@ function validateCandidate(candidate){
 
 module.exports = {
     Candidate: Candidate,
-    validateCandidate: validateCandidate
+    validate: validate
 };

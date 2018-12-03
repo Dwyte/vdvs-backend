@@ -1,13 +1,15 @@
 const auth = require('../middleware/auth');
+const admin = require('../middleware/admin');
+const _ = require('lodash');
 const express = require('express');
 const router = express.Router();
 const excelToJson = require('convert-excel-to-json');
 
 // Models
-const {Voter, validateVoter} = require('../models/voter');
+const {Voter, validate, generateToken} = require('../models/voter');
 
 // Import Voters
-router.post('/import', auth, async (req, res) => {
+router.post('/import', [auth, admin], async (req, res) => {
     if(req.files){
         var file = req.files.file,
             filename = file.name;
@@ -45,7 +47,7 @@ router.get('/totalVoters', async(req, res) => {
 });
 
 // Activate Voter with Lrn
-router.put('/activateVoter/:lrn',auth, async (req, res) => {
+router.put('/activateVoter/:lrn', [auth, admin], async (req, res) => {
     const voter = await Voter.findOneAndUpdate(
         {lrn: parseInt(req.params.lrn)}, 
         {canVote: true}, 
@@ -58,6 +60,17 @@ router.put('/activateVoter/:lrn',auth, async (req, res) => {
     res.send(activatedVoter);
 });
 
+// Auth Voter
+router.post('/auth', async(req,res) => {
+    const { error } = validate(req.body);
+    if (error) res.status(400).send(error);
+
+    let voter = await Voter.findOne(_.pick(req.body, ['lrn','firsName', 'middleName', 'lastName', 'gradeLevel', 'section']));
+    if(!voter) return res.status(400).send('Invalid Voter Details.');
+
+    const token = generateToken();
+    res.send(token);
+});
 
 function ImportExcel(filename){
     const result = excelToJson({
@@ -76,7 +89,7 @@ function ImportExcel(filename){
     });
 
     result.Sheet1.forEach(element => {
-        validateVoter(element);
+        validate(element);
 
         const voter = new Voter({
             lrn: element.lrn,

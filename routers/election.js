@@ -1,4 +1,5 @@
 const auth = require('../middleware/auth');
+const admin = require('../middleware/admin');
 const express = require('express');
 const router = express.Router();
 
@@ -16,7 +17,7 @@ router.get('/', async (req, res) => {
 
 
 // Create Election
-router.post('/createElection', auth, async (req, res) => {
+router.post('/createElection', [auth, admin], async (req, res) => {
     let election = await Election.findOne();
 
     if(election)
@@ -28,7 +29,7 @@ router.post('/createElection', auth, async (req, res) => {
 });
 
 // Begin Election
-router.put('/beginElection', auth, async (req, res) => {
+router.put('/beginElection', [auth, admin], async (req, res) => {
     let election = await Election.findOneAndUpdate({},{hasBegun: true},{useFindAndModify: false, new: true});
 
     if(!election)
@@ -38,7 +39,7 @@ router.put('/beginElection', auth, async (req, res) => {
 });
 
 // End Election
-router.put('/endElection', auth, async (req, res) => {
+router.put('/endElection', [auth, admin], async (req, res) => {
     const election = await Election.findOneAndUpdate({},
         {hasEnded: true},
         {useFindAndModify: false, new: true});
@@ -50,7 +51,7 @@ router.put('/endElection', auth, async (req, res) => {
 });
 
 // Drop Database
-router.delete('/deleteElection', auth, async (req,res) => {
+router.delete('/deleteElection', [auth, admin], async (req,res) => {
     let election = await Election.findOne();
 
     if(!election)

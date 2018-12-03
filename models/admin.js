@@ -19,15 +19,17 @@ const adminSchema = new mongoose.Schema({
     },
 });
 
-adminSchema.methods.generateAuthToken = function() {
-    return jwt.sign({_id: this._id}, config.get('jsonTokenPrivKey'));
+// adminSchema.methods.generateAuthToken = function() {
+//     return jwt.sign({_id: this._id, isAdmin: true}, config.get('jsonTokenPrivKey'));
+// }
+
+function generateToken() {
+    return jwt.sign({_id: this._id, isAdmin: true}, config.get('jsonTokenPrivKey'));
 }
 
 const Admin = mongoose.model('Admin', adminSchema);
 
-
-
-function validateAdmin(admin){
+function validate(admin){
     const schema = {
         username: Joi.string().required().min(3).max(50),
         password: Joi.string().required().min(4).max(255)
@@ -38,6 +40,7 @@ function validateAdmin(admin){
 
 module.exports = {
     Admin: Admin,
-    validate: validateAdmin
+    validate: validate,
+    generateToken: generateToken
 }
 

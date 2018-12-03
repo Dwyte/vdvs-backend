@@ -1,4 +1,4 @@
-const {Admin, validate} = require('../models/admin');
+const {Admin, validate, generateToken} = require('../models/admin');
 const _ = require('lodash');
 const bcrypt = require('bcrypt');
 const express = require('express');
@@ -33,7 +33,7 @@ router.post('/auth', async (req, res) => {
     const validPassword = await bcrypt.compare(req.body.password, admin.password);
     if(!validPassword) return res.status(400).send('Invalid username or password');
 
-    const token = admin.generateAuthToken();
+    const token = generateToken();
     res.send(token);
 });
 

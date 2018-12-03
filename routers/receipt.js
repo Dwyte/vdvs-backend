@@ -1,3 +1,4 @@
+const auth = require('../middleware/auth');
 const express = require('express');
 const router = express.Router();
 
@@ -11,7 +12,7 @@ router.get('/:receiptID', async (req, res) => {
 });
 
 // Create Receipt
-router.post('/createReceipt', async (req, res) => {
+router.post('/createReceipt',auth ,async (req, res) => {
     const receipt = new Receipt({
         voterLRN: req.body.voterLRN,
         votedCandidates: req.body.votes

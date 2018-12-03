@@ -1,8 +1,9 @@
 const auth = require('../middleware/auth');
+const admin = require('../middleware/admin');
 const express = require('express');
 const router = express.Router();
 
-const {Candidate, validateCandidate} = require('../models/candidate');
+const {Candidate, validate} = require('../models/candidate');
 
 router.get('/:lrn', async (req, res) => {
     const candidate = await Candidate.findOne({lrn: req.params.lrn});
@@ -34,11 +35,10 @@ router.get('/', async (req, res) => {
 });
 
 // Nominate new candidate
-router.post('/nominateCandidate', auth, async (req, res) => {
+router.post('/nominateCandidate', [auth, admin], async (req, res) => {
     // Validate sent data
-    const {error} = validateCandidate(req.body);
-    if(error)
-        return res.send(error);
+    const {error} = validate(req.body);
+    if (error) return res.status(400).send(error);
 
     
     // Nominate Candidate
@@ -59,9 +59,9 @@ router.post('/nominateCandidate', auth, async (req, res) => {
 });
 
 // Update candidate
-router.put('/updateCandidate/:id', auth, async (req, res) => {
+router.put('/updateCandidate/:id', [auth, admin], async (req, res) => {
     // Validate sent data
-    const {error} = validateCandidate(req.body);
+    const {error} = validate(req.body);
     if(error)
         return res.status(400).send(error.details[0].message);
 
@@ -84,7 +84,7 @@ router.put('/updateCandidate/:id', auth, async (req, res) => {
 });
 
 // Record Voted Candidates
-router.put('/voteCandidates', async (req, res) => {
+router.put('/voteCandidates', auth, async (req, res) => {
     const votes = req.body.votes;
     var candidatesVoted = [];
 
@@ -108,7 +108,7 @@ router.put('/voteCandidates', async (req, res) => {
 });
 
 // Remove Candidate
-router.delete('/removeCandidate/:id', auth, async (req, res) => {
+router.delete('/removeCandidate/:id', [auth, admin], async (req, res) => {
     const candidate = await Candidate.findByIdAndRemove(req.params.id);
 
     if(!candidate)
