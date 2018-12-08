@@ -5,7 +5,7 @@ const election = require('./routers/election');
 const receipt = require('./routers/receipt');
 const admin = require('./routers/admin');
 const upload = require('express-fileupload');
-
+const cors = require('cors');
 
 // Server
 const config = require('config');
@@ -19,6 +19,7 @@ if(!config.get('jsonTokenPrivKey')){
 
 // Middlewares
 app.use(upload());
+app.use(cors())
 app.use(express.json());
 app.use(express.static(__dirname));
 
