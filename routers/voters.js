@@ -48,7 +48,7 @@ router.get('/totalVoters', async(req, res) => {
 
 // Activate Voter with Lrn
 router.put('/activateVoter/:lrn', [auth, admin], async (req, res) => {
-    const voter = await Voter.findOneAndUpdate(
+    let voter = await Voter.findOneAndUpdate(
         {lrn: parseInt(req.params.lrn)}, 
         {canVote: true}, 
         {useFindAndModify: false,new: true});
@@ -56,8 +56,9 @@ router.put('/activateVoter/:lrn', [auth, admin], async (req, res) => {
     if(!voter)
         return res.status(404).send('Voter was not found from the database...');
 
-    const activatedVoter = await voter.save();
-    res.send(activatedVoter);
+    voter = await voter.save()
+        .then(result => res.send(result))
+        .catch(error => res.send(error));
 });
 
 // Auth Voter
@@ -65,7 +66,8 @@ router.post('/auth', async(req,res) => {
     const { error } = validate(req.body);
     if (error) res.status(400).send(error);
 
-    let voter = await Voter.findOne(_.pick(req.body, ['lrn','firsName', 'middleName', 'lastName', 'gradeLevel', 'section']));
+    let voter = await Voter.findOne(_.pick(req.body, ['lrn','fullName', 'gradeLevel', 'section']));
+    
     if(!voter) return res.status(400).send('Invalid Voter Details.');
 
     const token = generateToken();
@@ -80,25 +82,17 @@ function ImportExcel(filename){
         },
         columnToKey:{
             A: 'lrn',
-            B: 'firstName',
-            C: 'middleName',
-            D: 'lastName',
-            E: 'gradeLevel',
-            F: 'section'
+            B: 'fullName',
+            C: 'gradeLevel',
+            D: 'section'
         }
     });
 
     result.Sheet1.forEach(element => {
         validate(element);
 
-        const voter = new Voter({
-            lrn: element.lrn,
-            firstName: element.firstName,
-            middleName: element.middleName || null,
-            lastName: element.lastName,
-            gradeLevel: element.gradeLevel,
-            section: element.section
-        });
+        const voter = new Voter(_pick(element,
+            ['lrn', 'fullName', 'gradeLevel', 'section']));
 
         voter.save();
 

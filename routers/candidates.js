@@ -1,10 +1,12 @@
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
 const express = require('express');
+const _ = require('lodash');
 const router = express.Router();
 
 const {Candidate, validate} = require('../models/candidate');
 
+// Get Candidate with LRN
 router.get('/:lrn', async (req, res) => {
     const candidate = await Candidate.findOne({lrn: req.params.lrn});
 
@@ -40,22 +42,13 @@ router.post('/nominateCandidate', [auth, admin], async (req, res) => {
     const {error} = validate(req.body);
     if (error) return res.status(400).send(error);
 
-    
     // Nominate Candidate
-    let candidate = new Candidate({
-        lrn: req.body.lrn,
-        firstName: req.body.firstName,
-        middleName: req.body.middleName,
-        lastName: req.body.lastName,
-        gradeLevel: req.body.gradeLevel,
-        section: req.body.section,
-        position: req.body.position,
-        votes: 0
-    });
+    let candidate = new Candidate(_.pick(req.body,
+        ['lrn','fullName', 'section', 'gradeLevel', 'position', 'votes']));
 
-    candidate = await candidate.save();
-
-    res.send(candidate);
+    candidate = await candidate.save()
+        .then(result => res.send(result))
+        .catch(error => res.send(error));
 });
 
 // Update candidate
@@ -66,21 +59,16 @@ router.put('/updateCandidate/:id', [auth, admin], async (req, res) => {
         return res.status(400).send(error.details[0].message);
 
     // find candidate with given id, and Update
-    let candidate = await Candidate.findOneAndUpdate({_id: req.params.id},{
-        lrn: req.body.lrn,
-        firstName: req.body.firstName,
-        middleName: req.body.middleName,
-        lastName: req.body.lastName,
-        gradeLevel: req.body.gradeLevel,
-        section: req.body.section,
-        position: req.body.position,
-    },{useFindAndModify: false,new: true})
+    let candidate = await Candidate.findOneAndUpdate({_id: req.params.id},_.pick(req.body,
+        ['lrn','fullName', 'section', 'gradeLevel', 'position', 'votes']),
+        {useFindAndModify: false,new: true})
 
     if(!candidate)
         return res.status(404).send('Candidate with the given id was not found from the database.');
 
-    candidate = await candidate.save();
-    res.send(candidate);
+    candidate = await candidate.save()
+        .then(result => res.send(result))
+        .catch(error => res.send(error));
 });
 
 // Record Voted Candidates

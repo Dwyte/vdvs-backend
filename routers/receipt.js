@@ -13,14 +13,12 @@ router.get('/:receiptID', async (req, res) => {
 
 // Create Receipt
 router.post('/createReceipt',auth ,async (req, res) => {
-    const receipt = new Receipt({
-        voterLRN: req.body.voterLRN,
-        votedCandidates: req.body.votes
-    });
+    let receipt = new Receipt(_.pick(req.body,
+        ['voterLRN', 'votedCandidates']));
 
-    const createdReceipt = await receipt.save();
-
-    res.send(createdReceipt);
+    receipt = await receipt.save()
+        .then(result => res.send(result))
+        .catch(error => res.send(error));
 });
 
 module.exports = router;

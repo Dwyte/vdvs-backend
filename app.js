@@ -12,11 +12,6 @@ const config = require('config');
 const express = require('express');
 const app = express();
 
-if(!config.get('jsonTokenPrivKey')){
-    console.log('FATAL ERROR: jsonTokenPrivKey is not defined');
-    process.exit();
-}
-
 // Middlewares
 app.use(upload());
 app.use(cors())
