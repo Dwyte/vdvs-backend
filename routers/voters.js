@@ -90,7 +90,7 @@ router.post('/auth', async(req,res) => {
     if(!voter) return res.status(400).send('Invalid Voter Details.');
 
     const token = generateToken();
-    res.send(token);
+    res.send({authToken: token});
 });
 
 function ImportExcel(filename){
