@@ -1,8 +1,10 @@
 const auth = require('../middleware/auth');
+const _ = require('lodash');
 const express = require('express');
 const router = express.Router();
 
 const Receipt = require('../models/receipt');
+const {Voter} = require('../models/voter');
 
 // Get Receipt
 router.get('/:receiptID', async (req, res) => {
@@ -15,6 +17,10 @@ router.get('/:receiptID', async (req, res) => {
 router.post('/createReceipt',auth ,async (req, res) => {
     let receipt = new Receipt(_.pick(req.body,
         ['voterLRN', 'votedCandidates']));
+
+    await Voter.findOneAndUpdate(
+        {lrn:receipt.voterLRN},
+        {voteReceiptID: receipt._id});
 
     receipt = await receipt.save()
         .then(result => res.send(result))

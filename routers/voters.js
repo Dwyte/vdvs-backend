@@ -46,6 +46,25 @@ router.get('/totalVoters', async(req, res) => {
     res.send(String(voters));
 });
 
+//Get the total Number of Voters that already Voted
+router.get('/totalVotedByLevel/:gradeLevel', async (req, res) => {
+    const voters = await Voter.count(
+        {voteReceiptID: {$ne:null},
+        gradeLevel: req.params.gradeLevel},
+    );
+
+    res.send(String(voters));
+});
+
+//Get the total Number of Voters
+router.get('/totalVotersByLevel/:gradeLevel', async(req, res) => {
+    const voters = await Voter.count({
+        gradeLevel: req.params.gradeLevel
+    });
+    
+    res.send(String(voters));
+});
+
 // Activate Voter with Lrn
 router.put('/activateVoter/:lrn', [auth, admin], async (req, res) => {
     let voter = await Voter.findOneAndUpdate(
@@ -91,7 +110,7 @@ function ImportExcel(filename){
     result.Sheet1.forEach(element => {
         validate(element);
 
-        const voter = new Voter(_pick(element,
+        const voter = new Voter(_.pick(element,
             ['lrn', 'fullName', 'gradeLevel', 'section']));
 
         voter.save();

@@ -13,24 +13,36 @@ router.get('/:lrn', async (req, res) => {
     res.send(candidate);
 })
 
+// Tally Candidates on Position
+router.get('/tally/:position', async (req, res) => {
+    const candidates = await Candidate
+        .find({position: req.params.position})
+        .sort({votes: -1});
+
+    res.send(candidates);
+});
+
 // Get all candidates
 router.get('/', async (req, res) => {
-    const presidentCandidates = await Candidate
-        .find({position: "President"})
-        .sort({votes: -1});
-
-    const vicePresCandidates = await Candidate
-        .find({position: "Vice President"})
-        .sort({votes: -1});
-
-    const secretaryCandidates = await Candidate
-        .find({position: "Secretary"})
-        .sort({votes: -1});
-
     const candidates = {
-        presidents: presidentCandidates,
-        vicePresidents: vicePresCandidates,
-        secretaries: secretaryCandidates
+        presidents: await Candidate
+        .find({position: "President"})
+        .sort({votes: -1}),
+        vicePresidents: await Candidate
+        .find({position: "Vice President"})
+        .sort({votes: -1}),
+        secretaries: await Candidate
+        .find({position: "Secretary"})
+        .sort({votes: -1}),
+        auditors: await Candidate
+        .find({position: "Auditor"})
+        .sort({votes: -1}),
+        treasurers: await Candidate
+        .find({position: "Treasurer"})
+        .sort({votes: -1}),
+        pios: await Candidate
+        .find({position: "PIO"})
+        .sort({votes: -1})
     }
 
     res.send(candidates);
@@ -44,7 +56,7 @@ router.post('/nominateCandidate', [auth, admin], async (req, res) => {
 
     // Nominate Candidate
     let candidate = new Candidate(_.pick(req.body,
-        ['lrn','fullName', 'section', 'gradeLevel', 'position', 'votes']));
+        ['lrn','fullName', 'party','section', 'gradeLevel', 'position', 'votes']));
 
     candidate = await candidate.save()
         .then(result => res.send(result))
@@ -60,7 +72,7 @@ router.put('/updateCandidate/:id', [auth, admin], async (req, res) => {
 
     // find candidate with given id, and Update
     let candidate = await Candidate.findOneAndUpdate({_id: req.params.id},_.pick(req.body,
-        ['lrn','fullName', 'section', 'gradeLevel', 'position', 'votes']),
+        ['lrn','fullName', 'party','section', 'gradeLevel', 'position', 'votes']),
         {useFindAndModify: false,new: true})
 
     if(!candidate)

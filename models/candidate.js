@@ -4,6 +4,7 @@ const Joi = require('joi');
 const candidateSchema = new mongoose.Schema({
     lrn: {type:Number, require: true, unique: true},
     fullName: {type: String, require: true},
+    party: {type: String, require: true},
     gradeLevel: {type: Number, min: 7, max: 12, require: true},
     section: {type: String, require: true},
     position: {type: String, require: true},
@@ -16,6 +17,7 @@ function validate(candidate){
     const schema = {
         lrn: Joi.number().required(),
         fullName: Joi.string().required(),
+        party: Joi.string().required(),
         gradeLevel: Joi.number().min(7).max(12).required(),
         section: Joi.string().required(),
         position: Joi.string().required(),
