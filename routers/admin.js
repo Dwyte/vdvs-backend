@@ -40,18 +40,24 @@ router.post('/auth', async (req, res) => {
 });
 
 router.put('/changePass', [auth, admin] , async (req, res) => {
+    const { error } = validate({
+        username: "admin",
+        password: req.body.newPass
+    })
+    if(error) return res.status(400).send(error.details[0].message);
+
     // Get Admin
     let admin = await Admin.findOne();
 
-    const validPassword = await bcrypt.compare(req.body.currentPass, admin.password);
+    const validPassword = await bcrypt.compare(req.body.currentPass, admin.password)
+        .catch(res => console.log(res));
     if(!validPassword) return res.status(400).send('Invalid current password');
 
     const salt = await bcrypt.genSalt(10);
     admin.password = await bcrypt.hash(req.body.newPass, salt);
-
     admin.save();
-
-    res.send("Password has changed!");
+    
+    res.send({message: 'Admin password has been changed!'});
 });
 
 module.exports = router;

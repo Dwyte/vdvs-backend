@@ -34,35 +34,32 @@ router.get('/searchVoter/:lrn', async (req, res) => {
 });
 
 //Get the total Number of Voters that already Voted
-router.get('/totalVoted', async (req, res) => {
-    const voters = await Voter.count({voteReceiptID: {$ne:null}});
-
-    res.send(String(voters));
-});
-
-//Get the total Number of Voters
-router.get('/totalVoters', async(req, res) => {
-    const voters = await Voter.countDocuments();
-    res.send(String(voters));
-});
-
-//Get the total Number of Voters that already Voted
-router.get('/totalVotedByLevel/:gradeLevel', async (req, res) => {
-    const voters = await Voter.count(
-        {voteReceiptID: {$ne:null},
-        gradeLevel: req.params.gradeLevel},
-    );
-
-    res.send(String(voters));
-});
-
-//Get the total Number of Voters
-router.get('/totalVotersByLevel/:gradeLevel', async(req, res) => {
-    const voters = await Voter.count({
-        gradeLevel: req.params.gradeLevel
-    });
+router.get('/totalVoted/:gradeLevel', async (req, res) => {
+    let totalVoters = 0;
     
-    res.send(String(voters));
+    if(req.params.gradeLevel == "all"){
+        totalVoters = await Voter.countDocuments({voteReceiptID: {$ne:null}});
+    }else{
+        totalVoters = await Voter.countDocuments(
+            {voteReceiptID: {$ne:null},
+            gradeLevel: req.params.gradeLevel},
+        );
+    }
+
+    res.send({totalVoters: totalVoters});
+});
+
+//Get the total Number of Voters
+router.get('/totalVoters/:gradeLevel', async(req, res) => {
+    let totalVoters = 0;
+    
+    if(req.params.gradeLevel == "all"){
+        totalVoters = await Voter.countDocuments();
+    }else{
+        totalVoters = await Voter.countDocuments({gradeLevel: req.params.gradeLevel});
+    }
+
+    res.send({totalVoters: totalVoters});
 });
 
 // Activate Voter with Lrn
