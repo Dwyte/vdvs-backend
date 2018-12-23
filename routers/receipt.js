@@ -16,7 +16,7 @@ router.get('/:receiptID', async (req, res) => {
 // Create Receipt
 router.post('/createReceipt',auth ,async (req, res) => {
     let receipt = new Receipt(_.pick(req.body,
-        ['voterLRN', 'votedCandidates']));
+        ['voterLRN', 'votes']));
 
     await Voter.findOneAndUpdate(
         {lrn:receipt.voterLRN},

@@ -6,7 +6,7 @@ const receiptSchema = mongoose.Schema({
         require: true,
         unique: true
     },
-    votedCandidates: [{
+    votes: [{
         type: Number,
         require: true
     }]

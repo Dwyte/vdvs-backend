@@ -5,6 +5,7 @@ const _ = require('lodash');
 const router = express.Router();
 
 const {Candidate, validate} = require('../models/candidate');
+const {Voter} = require('../models/voter');
 
 // Get Candidate with LRN
 router.get('/:lrn', async (req, res) => {
@@ -108,7 +109,7 @@ router.post('/nominateCandidate', [auth, admin], async (req, res) => {
         ['lrn','fullName', 'party','section', 'gradeLevel', 'position', 'votes']));
 
     candidate = await candidate.save()
-        .then(result => res.send(result))
+        .then(result => res.send({result: result, message: 'Candidate nominated.'}))
         .catch(error => res.send(error));
 });
 
@@ -128,7 +129,7 @@ router.put('/updateCandidate/:id', [auth, admin], async (req, res) => {
         return res.status(404).send('Candidate with the given id was not found from the database.');
 
     candidate = await candidate.save()
-        .then(result => res.send(result))
+        .then(result => res.send({result: result, message: 'Candidate updated.'}))
         .catch(error => res.send(error));
 });
 
@@ -137,33 +138,27 @@ router.put('/voteCandidates', auth, async (req, res) => {
     const votes = req.body.votes;
     var candidatesVoted = [];
 
+    const voter = Voter.find({lrn: req.body.voterLRN});
+    if (voter.voterReceiptID)
+        return res.status(403).send('Access denied, voter has already voted.');
+
     // Validation: Look for the candidates first..
     for(i = 0; i < votes.length;i++){
-        const candidate = await Candidate.findById(votes[i]);
-
-        if(!candidate)
-            return res.status(404).send(`No candidate found with the ID of ${votes[i]}`);
-
-        candidatesVoted.push(candidate);
+        await Candidate
+            .findOneAndUpdate({lrn: votes[i]},{$inc: {votes:1}})
+            .then((res) => { console.log(res); candidatesVoted.push(res.lrn); })
+            .catch((error) => {console.log(error)})
     }
 
-    // If all of them are existing and valid, now record the votes
-    candidatesVoted.forEach(candidate => {
-        candidate.votes += 1;
-        candidate.save();
-    });
-
-    res.send(candidatesVoted);
+    res.send({result: req.body, message: 'Votes are succesfully recorded.'});
 });
 
 // Remove Candidate
 router.delete('/removeCandidate/:id', [auth, admin], async (req, res) => {
-    const candidate = await Candidate.findByIdAndRemove(req.params.id);
-
-    if(!candidate)
-        return res.status(404).send('Candidate with the given id was not found.');
-
-    res.send(candidate);
+    await Candidate
+        .findByIdAndRemove(req.params.id)
+        .then((res) => {res.send({result: res, message: 'Candidate Removed.'});})
+        .catch((error) => {res.send(error)});
 });
 
 module.exports = router;
