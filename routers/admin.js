@@ -36,7 +36,7 @@ router.post('/auth', async (req, res) => {
     if(!validPassword) return res.status(400).send('Invalid username or password');
 
     const token = generateToken();
-    res.send({authToken: token});
+    res.send({authToken: token, success:"ok"});
 });
 
 router.put('/changePass', [auth, admin] , async (req, res) => {
