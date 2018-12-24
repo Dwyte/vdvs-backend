@@ -11,14 +11,14 @@ const {Voter, validate, generateToken} = require('../models/voter');
 // Import Voters
 router.post('/import', [auth, admin], async (req, res) => {
     if(req.files){
-        var file = req.files.file,
-            filename = file.name;
+        var file = req.files.file0,
+            filename = req.files.file0.name;
 
         file.mv("./uploads/"+filename, (error) => {
             if(error)
                 return res.send("Error" + error);
             else
-                return res.send(ImportExcel(filename));
+                return res.send({result:ImportExcel(filename), success:"ok"});
         });
     }
 });
