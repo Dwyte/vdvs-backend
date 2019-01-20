@@ -58,7 +58,7 @@ router.delete('/deleteElection', [auth, admin], async (req,res) => {
         return res.status(404).send('There is no current election.');
 
     election.db.dropDatabase()
-        .then(() => res.send('Database collections has been deleted.'));
+        .then(() => res.send({message: 'Database collections has been deleted.'}));
 });
 
 module.exports = router;
