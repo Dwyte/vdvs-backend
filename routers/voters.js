@@ -82,9 +82,20 @@ router.post('/auth', async(req,res) => {
     const { error } = validate(req.body);
     if (error) res.status(400).send(error);
 
-    let voter = await Voter.findOne(_.pick(req.body, ['lrn','fullName', 'gradeLevel', 'section']));
+    let voter = await Voter.findOne(_.pick(req.body, ['lrn']));
     
-    if(!voter) return res.status(400).send('Invalid Voter Details.');
+    if(!voter) 
+        return res.status(400).send('Invalid Voter LRN.');
+    
+    voterFromDB = _.pick(voter, ['fullName', 'gradeLevel','lrn','section']);
+    voterFromDB.fullName = voterFromDB.fullName.replace(/ /g,'').toLowerCase();
+    voterFromDB.section = voterFromDB.section.replace(/ /g,'').toLowerCase();
+    console.log(voterFromDB);
+
+    if(!_.isEqual(req.body, voterFromDB))
+        return res.status(400).send('Invalid Voter Details.');
+    
+    
 
     const token = generateToken();
     res.send({authToken: token});
