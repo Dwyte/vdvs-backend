@@ -21,7 +21,22 @@ app.use(express.static(__dirname));
 // Database
 const mongoose = require('mongoose');
 mongoose.connect(config.get('database'), {useNewUrlParser: true})
-    .then(() => console.log('Connected to Mongo-Database...'))
+    .then(async () => {
+        console.log('Connected to Mongo-Database...');
+
+        const admin = await mongoose.model('Admin').findOne();
+
+        if(admin == null){
+            const {Admin} = require('./models/admin');
+            const bcrypt = require('bcrypt');
+
+            const salt = await bcrypt.genSalt(10);
+            const admin = new Admin({username: 'admin', password: await bcrypt.hash('pass123', salt)});
+            await admin.save();
+
+            console.log('Admin account created.');
+        }
+    })
     .catch((error) => console.log('Unable to connect to MongoDB.', error));
 
 // Routes
