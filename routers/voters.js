@@ -13,12 +13,16 @@ router.post('/import', [auth, admin], async (req, res) => {
     if(req.files){
         var file = req.files.file0,
             filename = file.name;
+        
+        const path = require('path');
+        if(path.extname(filename) != '.xlsx')
+            res.status(400).send({message: 'Invalid file type. Please use a .xlsx file.'})
 
         file.mv("./uploads/"+filename, (error) => {
             if(error)
-                return res.send("Error" + error);
+                return res.status(400).send({message: error});
             else
-                return res.send({result: ImportExcel(filename), success: "ok"});
+                return res.send({result: ImportExcel(filename), message: "File Upload Success."});
         });
     }
 });
@@ -53,11 +57,10 @@ router.get('/totalVoted/:gradeLevel', async (req, res) => {
 router.get('/totalVoters/:gradeLevel', async(req, res) => {
     let totalVoters = 0;
     
-    if(req.params.gradeLevel == "all"){
+    if(req.params.gradeLevel == "all")
         totalVoters = await Voter.countDocuments();
-    }else{
+    else
         totalVoters = await Voter.countDocuments({gradeLevel: req.params.gradeLevel});
-    }
 
     res.send({totalVoters: totalVoters});
 });
@@ -85,7 +88,13 @@ router.post('/auth', async(req,res) => {
     let voter = await Voter.findOne(_.pick(req.body, ['lrn']));
     
     if(!voter) 
-        return res.status(400).send('Invalid Voter LRN.');
+        return res.status(404).send({message: `Voter not found.`});
+    
+    if(!voter.canVote)
+        return res.status(403).send({message: 'Sorry, voter cannot vote yet. Contact admin for more info.'});
+
+    if(voter.voteReceiptID)
+        return res.status(403).send({message: 'Voter has already voted.'});
     
     voterFromDB = _.pick(voter, ['fullName', 'gradeLevel','lrn','section']);
     voterFromDB.fullName = voterFromDB.fullName.replace(/ /g,'').toLowerCase();
@@ -94,8 +103,6 @@ router.post('/auth', async(req,res) => {
 
     if(!_.isEqual(req.body, voterFromDB))
         return res.status(400).send('Invalid Voter Details.');
-    
-    
 
     const token = generateToken();
     res.send({authToken: token});
@@ -115,15 +122,22 @@ function ImportExcel(filename){
         }
     });
 
-    result.Sheet1.forEach(element => {
+    result.Sheet1.forEach(async (element) => {
         validate(element);
 
-        const voter = new Voter(_.pick(element,
+        let voter = await Voter.findOne({lrn: element.lrn});
+
+        if(voter != null){
+            console.log(`Skipped - Voter already in the database: ${voter.lrn}`);
+            return;
+        }
+
+        voter = new Voter(_.pick(element,
             ['lrn', 'fullName', 'gradeLevel', 'section']));
 
-        voter.save();
+        await voter.save();
 
-        console.log("Added Voter");
+        console.log(`Success - Voter was added to the database: ${voter.lrn}`);
     });
 
     return result;

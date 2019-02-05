@@ -7,8 +7,8 @@ const Receipt = require('../models/receipt');
 const {Voter} = require('../models/voter');
 
 // Get Receipt
-router.get('/:receiptID', async (req, res) => {
-    const receipt = await Receipt.findById(req.params.receiptID)
+router.get('/:voterLRN', async (req, res) => {
+    const receipt = await Receipt.findOne({voterLRN: req.params.voterLRN});
 
     res.send(receipt);
 });
