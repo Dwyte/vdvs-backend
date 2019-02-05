@@ -6,6 +6,7 @@ const router = express.Router();
 
 const {Candidate, validate} = require('../models/candidate');
 const {Voter} = require('../models/voter');
+const Receipt = require('../models/receipt');
 
 // Get Candidate with LRN
 router.get('/:lrn', async (req, res) => {
@@ -138,9 +139,12 @@ router.put('/voteCandidates', auth, async (req, res) => {
     const votes = req.body.votes;
     var candidatesVoted = [];
 
-    const voter = Voter.find({lrn: req.body.voterLRN});
-    if (voter.voterReceiptID)
-        return res.status(403).send('Access denied, voter has already voted.');
+    const voter = await Voter.findOne({lrn: req.body.voterLRN});
+    if (voter.canVote == false)
+        return res.status(403).send({message: "Voter cannot vote yet, contact admin for help."});
+    
+    if (voter.voteReceiptID != null)
+        return res.status(403).send({message: 'Access denied, voter has already voted.'});
 
     // Validation: Look for the candidates first..
     for(i = 0; i < votes.length;i++){
@@ -150,7 +154,22 @@ router.put('/voteCandidates', auth, async (req, res) => {
             .catch((error) => {console.log(error)})
     }
 
-    res.send({result: req.body, message: 'Votes are succesfully recorded.'});
+    // Creates receipt
+    let receipt = new Receipt(_.pick(req.body,
+        ['voterLRN', 'votes']));
+
+    await Voter.findOneAndUpdate(
+        {lrn:receipt.voterLRN},
+        {voteReceiptID: receipt._id});
+
+    receipt = await receipt.save()
+        .then(result => res.send(result))
+        .catch(error => res.send(error));
+
+    voter.voterReceiptID = receipt._id;
+    voter.save();
+
+    res.send({result: receipt, message: 'Votes are succesfully recorded.'});
 });
 
 // Remove Candidate
