@@ -109,7 +109,7 @@ router.post('/auth', async(req,res) => {
 });
 
 function ImportExcel(filename){
-    const result = excelToJson({
+    const excelToJsonResult = excelToJson({
         sourceFile: './uploads/' + filename,
         header: {
             rows: 1
@@ -122,7 +122,9 @@ function ImportExcel(filename){
         }
     });
 
-    result.Sheet1.forEach(async (element) => {
+    var result;
+
+    excelToJsonResult.Sheet1.forEach(async (element) => {
         validate(element);
 
         let voter = await Voter.findOne({lrn: element.lrn});
