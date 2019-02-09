@@ -28,11 +28,11 @@ router.post('/import', [auth, admin], async (req, res) => {
 });
 
 // Get Voter with LRN
-router.get('/searchVoter/:lrn', async (req, res) => {
-    const voter = await Voter.findOne({lrn: req.params.lrn}).populate('voteReceiptID');
+router.get('/searchVoter/', async (req, res) => {
+    const voter = await Voter.find(req.body.param).populate('voteReceiptID');
 
-    if(!voter)
-        return res.status(404).send('The voter with the given lrn was not found');
+    if(voter.length == 0)
+        return res.status(404).send('The voter with the given parameter was not found');
 
     res.send(voter);
 });

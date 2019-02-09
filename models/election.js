@@ -12,12 +12,6 @@ const electionSchema = new mongoose.Schema({
             Auditor: null,
             Treasurer: null,
             PIO: null,
-            g7Rep: null,
-            g8Rep: null,
-            g9Rep: null,
-            g10Rep: null,
-            g11Rep: null,
-            g12Rep: null
         }
     },
 });

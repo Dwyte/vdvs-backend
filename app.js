@@ -20,8 +20,9 @@ app.use(express.static(__dirname));
 
 // Database
 const mongoose = require('mongoose');
-mongoose.connect(config.get('database'), {useNewUrlParser: true})
+mongoose.connect(config.get('database'), config.get("dbOptions"))
     .then(async () => {
+
         console.log('Connected to Mongo-Database...');
 
         const admin = await mongoose.model('Admin').findOne();
