@@ -28,11 +28,11 @@ router.post('/import', [auth, admin], async (req, res) => {
 });
 
 // Get Voter with LRN
-router.get('/searchVoter/', async (req, res) => {
-    const voter = await Voter.find(req.body.param).populate('voteReceiptID');
-
-    if(voter.length == 0)
-        return res.status(404).send('The voter with the given parameter was not found');
+router.post('/searchVoter/', async (req, res) => {
+    const voter = await Voter.find(req.body.param).populate('voteReceiptID')
+        .catch((error) => {
+            return res.send(error.message);
+        });
 
     res.send(voter);
 });
@@ -67,13 +67,12 @@ router.get('/totalVoters/:gradeLevel', async(req, res) => {
 
 // Activate Voter with Lrn
 router.put('/activateVoter/:lrn', [auth, admin], async (req, res) => {
-    let voter = await Voter.findOneAndUpdate(
-        {lrn: parseInt(req.params.lrn)}, 
-        {canVote: true}, 
-        {useFindAndModify: false,new: true});
+    let voter = await Voter.findOne({lrn: parseInt(req.params.lrn)});
 
     if(!voter)
         return res.status(404).send('Voter was not found from the database...');
+
+    voter.canVote = !voter.canVote;
 
     voter = await voter.save()
         .then(result => res.send(result))
@@ -122,11 +121,11 @@ function ImportExcel(filename){
         }
     });
 
-    var result;
-
     excelToJsonResult.Sheet1.forEach(async (element) => {
-        validate(element);
-
+        console.log(element);
+        if(!validate(element))
+            return console.error(`Voter Schema invalid.`);
+        
         let voter = await Voter.findOne({lrn: element.lrn});
 
         if(voter != null){
@@ -142,7 +141,7 @@ function ImportExcel(filename){
         console.log(`Success - Voter was added to the database: ${voter.lrn}`);
     });
 
-    return result;
+    return excelToJsonResult;
 }
 
 module.exports = router;
