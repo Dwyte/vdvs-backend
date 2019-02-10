@@ -15,8 +15,8 @@ router.post('/import', [auth, admin], async (req, res) => {
             filename = file.name;
         
         const path = require('path');
-        if(path.extname(filename) != '.xlsx')
-            res.status(400).send({message: 'Invalid file type. Please use a .xlsx file.'})
+        if(path.extname(filename) != '.xlsx' && path.extname(filename) != '.csv')
+            return res.status(400).send({message: 'Invalid file type. Please use a .xlsx file.'})
 
         file.mv("./uploads/"+filename, (error) => {
             if(error)

@@ -28,19 +28,7 @@ router.get('/', async (req, res) => {
         treasurers: await Candidate
         .find({position: "Treasurer"}),
         pios: await Candidate
-        .find({position: "PIO"}),
-        g7rep: await Candidate
-        .find({position: "G7 Representative"}),
-        g8rep: await Candidate
-        .find({position: "G8 Representative"}),
-        g9rep: await Candidate
-        .find({position: "G9 Representative"}),
-        g10rep: await Candidate
-        .find({position: "G10 Representative"}),
-        g11rep: await Candidate
-        .find({position: "G11 Representative"}),
-        g12rep: await Candidate
-        .find({position: "G12 Representative"})
+        .find({position: "PIO"})
     }
 
     res.send(candidates);
@@ -75,24 +63,6 @@ router.get('/tally', async (req, res) => {
         .sort({votes: -1}),
         pios: await Candidate
         .find({position: "PIO"})
-        .sort({votes: -1}),
-        g7rep: await Candidate
-        .find({position: "G7 Representative"})
-        .sort({votes: -1}),
-        g8rep: await Candidate
-        .find({position: "G8 Representative"})
-        .sort({votes: -1}),
-        g9rep: await Candidate
-        .find({position: "G9 Representative"})
-        .sort({votes: -1}),
-        g10rep: await Candidate
-        .find({position: "G10 Representative"})
-        .sort({votes: -1}),
-        g11rep: await Candidate
-        .find({position: "G11 Representative"})
-        .sort({votes: -1}),
-        g12rep: await Candidate
-        .find({position: "G12 Representative"})
         .sort({votes: -1})
     }
 
@@ -105,8 +75,17 @@ router.post('/nominateCandidate', [auth, admin], async (req, res) => {
     const {error} = validate(req.body);
     if (error) return res.status(400).send(error);
 
+    // Checking
+    let candidate = await Candidate.findOne(_.pick(req.body, ['lrn']));
+    if(candidate)
+        return res.status(400).send({message: `Candidate ${candidate.lrn} already nominated.`})
+
+    candidate = await Candidate.findOne(_.pick(req.body, ['position', 'party']));
+    if(candidate)
+        return res.status(400).send({message: `Someone is already nominated for ${candidate.position} on the ${candidate.party} party.`})
+
     // Nominate Candidate
-    let candidate = new Candidate(_.pick(req.body,
+    candidate = new Candidate(_.pick(req.body,
         ['lrn','fullName', 'party','section', 'gradeLevel', 'position', 'votes']));
 
     candidate = await candidate.save()
@@ -121,8 +100,17 @@ router.put('/updateCandidate/:id', [auth, admin], async (req, res) => {
     if(error)
         return res.status(400).send(error.details[0].message);
 
-    // find candidate with given id, and Update
-    let candidate = await Candidate.findOneAndUpdate({_id: req.params.id},_.pick(req.body,
+    // Checking
+    let candidate = await Candidate.findOne({_id: {$ne: req.params.id}, lrn: req.body.lrn});
+    if(candidate)
+        return res.status(400).send({message: `Candidate ${req.body.lrn} already nominated.`})
+
+    candidate = await Candidate.findOne({_id: {$ne: req.params.id}, position: req.body.position,party: req.body.party});
+    if(candidate)
+        return res.status(400).send({message: `Someone is already nominated for ${candidate.position} on the ${candidate.party} party.`})
+
+    // Find candidate with given id, and Update
+    candidate = await Candidate.findOneAndUpdate({_id: req.params.id},_.pick(req.body,
         ['lrn','fullName', 'party','section', 'gradeLevel', 'position', 'votes']),
         {useFindAndModify: false,new: true})
 
@@ -174,10 +162,14 @@ router.put('/voteCandidates', auth, async (req, res) => {
 
 // Remove Candidate
 router.delete('/removeCandidate/:id', [auth, admin], async (req, res) => {
-    await Candidate
+    const candidate = await Candidate
         .findByIdAndRemove(req.params.id)
-        .then((res) => {res.send({result: res, message: 'Candidate Removed.'});})
         .catch((error) => {res.send(error)});
+
+    if(!candidate)
+        return res.status(404).send({message: "Candidate not found."});
+
+    res.send({result: candidate, message: 'Candidate Removed.'});
 });
 
 module.exports = router;
