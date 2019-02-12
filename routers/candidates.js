@@ -125,7 +125,6 @@ router.put('/updateCandidate/:id', [auth, admin], async (req, res) => {
 // Record Voted Candidates
 router.put('/voteCandidates', auth, async (req, res) => {
     const votes = req.body.votes;
-    var candidatesVoted = [];
 
     const voter = await Voter.findOne({lrn: req.body.voterLRN});
     if (voter.canVote == false)
@@ -138,7 +137,6 @@ router.put('/voteCandidates', auth, async (req, res) => {
     for(i = 0; i < votes.length;i++){
         await Candidate
             .findOneAndUpdate({lrn: votes[i]},{$inc: {votes:1}})
-            .then((res) => { console.log(res); candidatesVoted.push(res.lrn); })
             .catch((error) => {console.log(error)})
     }
 
