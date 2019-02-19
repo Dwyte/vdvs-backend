@@ -47,6 +47,9 @@ router.put('/endElection', [auth, admin], async (req, res) => {
     const auditorTally = await Candidate.find({position: 'Auditor'}).sort({votes: -1});
     const treasurerTally = await Candidate.find({position: 'Treasurer'}).sort({votes: -1});
     const pioTally = await Candidate.find({position: 'PIO'}).sort({votes: -1});
+    const poTally = await Candidate.find({position: 'PO'}).sort({votes: -1});
+    const g9Chairman = await Candidate.find({position: 'G9 Chairman'}).sort({votes: -1});
+    const g10Chairman = await Candidate.find({position: 'G10 Chairman'}).sort({votes: -1});
     
     const election = await Election.findOneAndUpdate({},
         {hasEnded: true,
@@ -56,7 +59,10 @@ router.put('/endElection', [auth, admin], async (req, res) => {
             Secretary: secretaryTally[0],
             Auditor: auditorTally[0],
             Treasurer: treasurerTally[0],
-            PIO: pioTally[0]
+            PIO: pioTally[0],
+            PO: poTally[0],
+            G9Chairman: g9Chairman[0],
+            G10Chairman: g10Chairman[0]
         }},
         {useFindAndModify: false, new: true});
 

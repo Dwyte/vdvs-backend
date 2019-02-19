@@ -69,6 +69,9 @@ router.get('/totalVoters/:gradeLevel', async(req, res) => {
 router.put('/activateVoter/:lrn', [auth, admin], async (req, res) => {
     let voter = await Voter.findOne({lrn: parseInt(req.params.lrn)});
 
+    if(voter.voteReceiptID)
+        return res.status(400).send('Voter has already voted. Sorry...');
+        
     if(!voter)
         return res.status(404).send('Voter was not found from the database...');
 

@@ -8,7 +8,7 @@ const {Voter} = require('../models/voter');
 
 // Get Receipt
 router.get('/:voterLRN', async (req, res) => {
-    const receipt = await Receipt.findOne({voterLRN: req.params.voterLRN});
+    const receipt = await Receipt.findOne({voterLRN: req.params.voterLRN})
 
     res.send(receipt);
 });
