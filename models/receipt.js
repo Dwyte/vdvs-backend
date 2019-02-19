@@ -8,7 +8,8 @@ const receiptSchema = mongoose.Schema({
     },
     votes: [{
         type: Number,
-        require: true
+        require: true,
+        ref: 'Candidate'
     }]
 })
 

@@ -28,7 +28,13 @@ router.get('/', async (req, res) => {
         treasurers: await Candidate
         .find({position: "Treasurer"}),
         pios: await Candidate
-        .find({position: "PIO"})
+        .find({position: "PIO"}),
+        pos: await Candidate
+        .find({position: "PO"}),
+        g9Chairmans: await Candidate
+        .find({position: "G9 Chairman"}),
+        g10Chairmans: await Candidate
+        .find({position: "G10 Chairman"})
     }
 
     res.send(candidates);
@@ -63,7 +69,16 @@ router.get('/tally', async (req, res) => {
         .sort({votes: -1}),
         pios: await Candidate
         .find({position: "PIO"})
+        .sort({votes: -1}),
+        g9Chairmans: await Candidate
+        .find({position: "PO"})
+        .sort({votes: -1}),pios: await Candidate
+        .find({position: "G9 Chairman"})
+        .sort({votes: -1}),
+        g10Chairmans: await Candidate
+        .find({position: "G10 Chairman"})
         .sort({votes: -1})
+        
     }
 
     res.send(candidates);
