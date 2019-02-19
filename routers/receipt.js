@@ -13,6 +13,7 @@ router.get('/:voterLRN', async (req, res) => {
     res.send(receipt);
 });
 
+
 // Create Receipt
 router.post('/createReceipt',auth ,async (req, res) => {
     let receipt = new Receipt(_.pick(req.body,

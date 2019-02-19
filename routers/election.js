@@ -66,6 +66,40 @@ router.put('/endElection', [auth, admin], async (req, res) => {
     res.send(election);
 });
 
+// Export Results
+var jexcel=require('json2excel');
+router.get('/exportResults', async (req, res) => {
+    const election = await Election.findOne();
+
+    var data = {
+        sheets: [{
+            header: {
+                'a': 'Name',
+                'b': 'Position',
+                'c': 'Votes'
+            },
+            items: [
+             {
+                a:'john',
+                b:'how to use this'
+             },
+             {
+                a:'Bob',
+                b:'so Easy'
+             }
+            ],
+            sheetName: 'sheet1',
+        }],
+        filepath: 'j2x.xlsx'
+    } 
+     
+    jexcel.j2e(data,function(err){ 
+        console.log('finish')
+    });
+
+    res.send("pop");
+});
+
 // Drop Database
 router.delete('/deleteElection', [auth, admin], async (req,res) => {
     let election = await Election.findOne();
