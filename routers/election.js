@@ -2,6 +2,7 @@ const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
 const express = require('express');
 const router = express.Router();
+const path = require('path');
 
 const Election = require('../models/election');
 const {Candidate} = require('../models/candidate');
@@ -72,39 +73,119 @@ router.put('/endElection', [auth, admin], async (req, res) => {
     res.send(election);
 });
 
-// Export Results
+// Export
 var jexcel=require('json2excel');
-router.get('/exportResults', async (req, res) => {
-    const election = await Election.findOne();
+router.get('/electionTally', async (req, res) => {
+    const candidates = {
+        presidents: await Candidate
+        .find({position: "President"})
+        .sort({votes: -1}),
+        vicePresidents: await Candidate
+        .find({position: "Vice President"})
+        .sort({votes: -1}),
+        secretaries: await Candidate
+        .find({position: "Secretary"})
+        .sort({votes: -1}),
+        auditors: await Candidate
+        .find({position: "Auditor"})
+        .sort({votes: -1}),
+        treasurers: await Candidate
+        .find({position: "Treasurer"})
+        .sort({votes: -1}),
+        pios: await Candidate
+        .find({position: "PIO"})
+        .sort({votes: -1}),
+        pos: await Candidate
+        .find({position: "PO"})
+        .sort({votes: -1}), 
+        g9Chairmans: await Candidate
+        .find({position: "G9 Chairman"})
+        .sort({votes: -1}),
+        g10Chairmans: await Candidate
+        .find({position: "G10 Chairman"})
+        .sort({votes: -1})
+        
+    }
 
     var data = {
         sheets: [{
             header: {
-                'a': 'Name',
-                'b': 'Position',
-                'c': 'Votes'
+                position: 'Position',
+                fullName: 'Name',
+                votes: 'Votes'
             },
-            items: [
-             {
-                a:'john',
-                b:'how to use this'
-             },
-             {
-                a:'Bob',
-                b:'so Easy'
-             }
-            ],
+            items: candidates.presidents.concat(candidates.vicePresidents).concat(candidates.secretaries)
+                .concat(candidates.treasurers).concat(candidates.auditors).concat(candidates.pios)
+                .concat(candidates.pos).concat(candidates.g10Chairmans).concat(candidates.g9Chairmans),
             sheetName: 'sheet1',
         }],
-        filepath: 'j2x.xlsx'
+        filepath: 'election-tally.xlsx'
     } 
      
     jexcel.j2e(data,function(err){ 
-        console.log('finish')
+        res.sendFile(path.join(__dirname, '../election-tally.xlsx'));
+    });
+});
+
+router.get('/electionResults', async (req, res) => {
+    const candidates = {
+        presidents: await Candidate
+        .find({position: "President"})
+        .sort({votes: -1}),
+        vicePresidents: await Candidate
+        .find({position: "Vice President"})
+        .sort({votes: -1}),
+        secretaries: await Candidate
+        .find({position: "Secretary"})
+        .sort({votes: -1}),
+        auditors: await Candidate
+        .find({position: "Auditor"})
+        .sort({votes: -1}),
+        treasurers: await Candidate
+        .find({position: "Treasurer"})
+        .sort({votes: -1}),
+        pios: await Candidate
+        .find({position: "PIO"})
+        .sort({votes: -1}),
+        pos: await Candidate
+        .find({position: "PO"})
+        .sort({votes: -1}), 
+        g9Chairmans: await Candidate
+        .find({position: "G9 Chairman"})
+        .sort({votes: -1}),
+        g10Chairmans: await Candidate
+        .find({position: "G10 Chairman"})
+        .sort({votes: -1})
+        
+    }
+
+    var items = []
+
+    for(var key in candidates){
+        if(candidates[key][0] != null){
+            items.push(candidates[key][0]);
+        }
+    }
+
+    var data = {
+        sheets: [{
+            header: {
+                position: 'Position',
+                fullName: 'Name',
+                votes: 'Votes'
+            },
+            items: items,
+            sheetName: 'sheet1',
+        }],
+        filepath: 'election-results.xlsx'
+    } 
+     
+    jexcel.j2e(data,function(err){ 
+        res.sendFile(path.join(__dirname, '../election-results.xlsx'));
     });
 
-    res.send("pop");
 });
+
 
 // Drop Database
 router.delete('/deleteElection', [auth, admin], async (req,res) => {

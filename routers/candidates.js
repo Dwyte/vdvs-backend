@@ -70,9 +70,10 @@ router.get('/tally', async (req, res) => {
         pios: await Candidate
         .find({position: "PIO"})
         .sort({votes: -1}),
-        g9Chairmans: await Candidate
+        pos: await Candidate
         .find({position: "PO"})
-        .sort({votes: -1}),pios: await Candidate
+        .sort({votes: -1}),
+        g9Chairmans: await Candidate
         .find({position: "G9 Chairman"})
         .sort({votes: -1}),
         g10Chairmans: await Candidate
