@@ -75,7 +75,7 @@ router.put('/endElection', [auth, admin], async (req, res) => {
 
 // Export
 var jexcel=require('json2excel');
-router.get('/electionTally', async (req, res) => {
+router.get('/electionTally',[auth, admin], async (req, res) => {
     const candidates = {
         presidents: await Candidate
         .find({position: "President"})
@@ -127,7 +127,7 @@ router.get('/electionTally', async (req, res) => {
     });
 });
 
-router.get('/electionResults', async (req, res) => {
+router.get('/electionResults',[auth, admin], async (req, res) => {
     const candidates = {
         presidents: await Candidate
         .find({position: "President"})
