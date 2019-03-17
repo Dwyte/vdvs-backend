@@ -50,6 +50,7 @@ app.use("/api/candidates", candidates);
 app.use("/api/election", election);
 app.use("/api/receipt", receipt);
 app.use("/api/admin", admin);
+
 app.get("/*", (req, res) => {
   res.sendFile(path.join(__dirname, "./public/index.html"));
 });
