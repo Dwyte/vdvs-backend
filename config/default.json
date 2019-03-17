@@ -1,5 +1,5 @@
 {
-    "database": "mongodb://localhost:27017/vdvs-dev",
-    "dbOptions": {"user": "vortexdwyte", "pass": "vdvspass","auth": {"authdb": "admin"}},
-    "jsonTokenPrivKey": "vdvs_SscurePrivateKey"
+  "database": "mongodb://localhost:27017/vdvs-dev",
+  "dbOptions": "",
+  "jsonTokenPrivKey": "vdvs_SscurePrivateKey"
 }
