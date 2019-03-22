@@ -15,6 +15,11 @@ router.post("/import", [auth, admin], async (req, res) => {
       filename = file.name;
 
     const path = require("path");
+    const fs = require("fs");
+
+    // if uploads dir doesnt exists make one
+    if (!fs.existsSync("./uploads/")) fs.mkdirSync("./uploads");
+
     if (path.extname(filename) != ".xlsx" && path.extname(filename) != ".csv")
       return res
         .status(400)
